@@ -18,8 +18,9 @@
   {% tailwind_css %}
   {# Vendored, pinned: htmx 2.0.4, Alpine.js 3.14.8 (no third-party CDN at runtime). #}
   <script src="{% static 'js/vendor/htmx.min.js' %}" defer></script>
-  <script src="{% static 'js/vendor/alpine.min.js' %}" defer></script>
+  {# app.js registers Alpine stores on "alpine:init", so it must run before Alpine starts. #}
   <script src="{% static 'js/app.js' %}" defer></script>
+  <script src="{% static 'js/vendor/alpine.min.js' %}" defer></script>
   {% include "partials/_tracking.html" %}
   {% block extra_head %}{% endblock %}
 </head>

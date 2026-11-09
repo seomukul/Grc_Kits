@@ -148,3 +148,38 @@ class ContentTests(TestCase):
     def test_product_page_shows_faqs(self):
         resp = self.client.get(reverse("catalog:detail", args=["featured-kit"]))
         self.assertContains(resp, "How do I receive my files?")
+
+
+class HeaderMenuTests(TestCase):
+    def setUp(self):
+        call_command("seed_content", verbosity=0)
+
+    def test_services_dropdown_lists_active_services(self):
+        Service.objects.filter(slug="vapt").update(is_active=False)
+        html = self.client.get("/").content.decode()
+        self.assertIn('id="services-menu"', html)
+        self.assertIn(reverse("services:detail", args=["isms-iso-27001"]), html)
+        self.assertNotIn(reverse("services:detail", args=["vapt"]), html)
+
+    def test_app_js_loads_before_alpine(self):
+        # Alpine stores (mobile menu, cart badge) are registered on "alpine:init" in app.js.
+        html = self.client.get("/").content.decode()
+        self.assertLess(html.index("js/app.js"), html.index("js/vendor/alpine.min.js"))
+
+
+class TemplateHygieneTests(TestCase):
+    def test_no_template_syntax_leaks_into_pages(self):
+        """Multi-line {# #} comments aren't valid Django syntax and render as visible text."""
+        import re
+        from pathlib import Path
+
+        from django.conf import settings
+
+        for path in Path(settings.BASE_DIR, "templates").rglob("*.html"):
+            for n, line in enumerate(path.read_text().splitlines(), 1):
+                if "{#" in line:
+                    self.assertIn("#}", line[line.index("{#"):], f"Unclosed {{# on one line: {path}:{n}")
+        call_command("seed_content", verbosity=0)
+        for url in ["/", "/services/", "/kits/", "/blog/", "/contact/", "/cart/"]:
+            html = self.client.get(url).content.decode()
+            self.assertIsNone(re.search(r"\{#|#\}|\{%|%\}", html), f"Template syntax visible on {url}")

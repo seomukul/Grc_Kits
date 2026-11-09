@@ -5,7 +5,38 @@
     <div class="hidden items-center gap-7 text-sm lg:flex">
       <a href="{% url 'catalog:list' %}" class="hover:text-brand-300">Toolkits</a>
       <a href="{% url 'catalog:list' %}?type=bundle" class="hover:text-brand-300">Bundles</a>
-      <a href="{% url 'services:list' %}" class="hover:text-brand-300">Services</a>
+      <div class="relative" x-data="{ open: false, hovering: false, hoveredAt: 0 }"
+           @mouseenter="open = true; hovering = true; hoveredAt = Date.now()" @mouseleave="open = false; hovering = false"
+           @keydown.escape="open = false; $refs.btn.focus()">
+        {% comment %}Touch tap (mouseenter + click together): keep it open. Mouse already hovering: go to the Services page. Keyboard: toggle.{% endcomment %}
+        <button type="button" x-ref="btn"
+                @click="if (Date.now() - hoveredAt < 400) { open = true } else if (hovering) { window.location = '{% url 'services:list' %}' } else { open = !open }" :aria-expanded="open" aria-haspopup="true" aria-controls="services-menu"
+                class="flex items-center gap-1 hover:text-brand-300 {% if request.resolver_match.app_name == 'services' %}text-brand-300{% endif %}">
+          Services
+          <svg class="size-4 transition" :class="open && 'rotate-180'" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd"/></svg>
+        </button>
+        {# pt-3 bridges the gap so the menu doesn't close while the pointer moves down #}
+        <div id="services-menu" x-cloak x-show="open" x-transition.opacity.origin.top
+             @click.outside="open = false" class="absolute left-1/2 top-full z-50 w-[34rem] -translate-x-1/2 pt-3">
+          <div class="overflow-hidden rounded-md border border-white/10 bg-brand-900 shadow-2xl">
+            <div class="grid grid-cols-2 gap-1 p-3">
+              {% for s in nav_services %}
+              <a href="{{ s.get_absolute_url }}" class="group flex gap-3 rounded-sm p-3 hover:bg-white/5 focus:bg-white/5 focus:outline-none">
+                <span class="mt-0.5 shrink-0 text-brand-400">{% include "partials/_icon.html" with name=s.icon cls="size-5" %}</span>
+                <span>
+                  <span class="block text-sm font-medium text-slate-100 group-hover:text-brand-200">{{ s.title }}</span>
+                  <span class="mt-0.5 line-clamp-2 block text-xs text-slate-400">{{ s.summary }}</span>
+                </span>
+              </a>
+              {% endfor %}
+            </div>
+            <div class="flex items-center justify-between border-t border-white/10 bg-brand-950/60 px-6 py-3 text-xs">
+              <a href="{% url 'services:list' %}" class="font-semibold uppercase tracking-[0.15em] text-brand-300 hover:text-brand-200">All services &rarr;</a>
+              <a href="{% url 'pages:contact' %}" class="text-slate-400 hover:text-brand-200">Book a consultation</a>
+            </div>
+          </div>
+        </div>
+      </div>
       <a href="{% url 'blog:list' %}" class="hover:text-brand-300">Blog</a>
       <a href="{% url 'pages:about' %}" class="hover:text-brand-300">About</a>
       <a href="{% url 'pages:contact' %}" class="hover:text-brand-300">Contact</a>
@@ -29,7 +60,16 @@
     <div class="container-page flex flex-col gap-1 py-3 text-sm">
       <a href="{% url 'catalog:list' %}" class="rounded px-2 py-2 hover:bg-white/5">Toolkits</a>
       <a href="{% url 'catalog:list' %}?type=bundle" class="rounded px-2 py-2 hover:bg-white/5">Bundles</a>
-      <a href="{% url 'services:list' %}" class="rounded px-2 py-2 hover:bg-white/5">Services</a>
+      <div x-data="{ sub: false }">
+        <button type="button" @click="sub = !sub" :aria-expanded="sub" class="flex w-full items-center justify-between rounded px-2 py-2 hover:bg-white/5">
+          Services
+          <svg class="size-4 transition" :class="sub && 'rotate-180'" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.06l3.71-3.83a.75.75 0 1 1 1.08 1.04l-4.25 4.39a.75.75 0 0 1-1.08 0L5.21 8.27a.75.75 0 0 1 .02-1.06Z" clip-rule="evenodd"/></svg>
+        </button>
+        <div x-cloak x-show="sub" x-transition class="ml-3 flex flex-col border-l border-white/10 pl-3">
+          {% for s in nav_services %}<a href="{{ s.get_absolute_url }}" class="rounded px-2 py-1.5 text-slate-300 hover:bg-white/5 hover:text-brand-200">{{ s.title }}</a>{% endfor %}
+          <a href="{% url 'services:list' %}" class="rounded px-2 py-1.5 text-xs font-semibold uppercase tracking-wider text-brand-300">All services &rarr;</a>
+        </div>
+      </div>
       <a href="{% url 'blog:list' %}" class="rounded px-2 py-2 hover:bg-white/5">Blog</a>
       <a href="{% url 'pages:about' %}" class="rounded px-2 py-2 hover:bg-white/5">About</a>
       <a href="{% url 'pages:contact' %}" class="rounded px-2 py-2 hover:bg-white/5">Contact</a>
