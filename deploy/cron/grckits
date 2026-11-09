@@ -1,0 +1,13 @@
+# /etc/cron.d/grckits
+SHELL=/bin/bash
+DJANGO_SETTINGS_MODULE=config.settings.prod
+MANAGE="/srv/grckits/venv/bin/python /srv/grckits/app/manage.py"
+
+# Abandoned-checkout reminders (no-op unless enabled in Admin -> Site settings)
+15 * * * *   grckits  cd /srv/grckits/app && $MANAGE send_abandoned_cart_emails >> /var/log/grckits/cron.log 2>&1
+# Retry newsletter sync for anyone the email tool rejected earlier
+40 */6 * * * grckits  cd /srv/grckits/app && $MANAGE sync_subscribers >> /var/log/grckits/cron.log 2>&1 || true
+# Housekeeping
+30 4 * * *   grckits  cd /srv/grckits/app && $MANAGE clearsessions >> /var/log/grckits/cron.log 2>&1
+# Nightly database + media backup
+0 3 * * *    grckits  /srv/grckits/app/deploy/backup.sh >> /var/log/grckits/backup.log 2>&1

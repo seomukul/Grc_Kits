@@ -4,11 +4,16 @@ from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 
-from apps.blog.sitemaps import PostSitemap
+from apps.blog.sitemaps import BlogCategorySitemap, PostSitemap
 from apps.catalog.sitemaps import ProductSitemap
 from apps.pages.sitemaps import StaticViewSitemap
 
-sitemaps = {"static": StaticViewSitemap, "products": ProductSitemap, "blog": PostSitemap}
+sitemaps = {
+    "static": StaticViewSitemap,
+    "products": ProductSitemap,
+    "blog": PostSitemap,
+    "blog-categories": BlogCategorySitemap,
+}
 
 urlpatterns = [
     path("admin/2fa/", include("apps.core.two_factor_urls")),

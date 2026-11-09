@@ -10,12 +10,25 @@ class Subscriber(TimeStampedModel):
     source = models.CharField(max_length=50, blank=True, help_text="Where they signed up, e.g. footer, blog, kit page.")
     is_active = models.BooleanField(default=True)
     consent_ip = models.GenericIPAddressField(null=True, blank=True)
+    unsubscribed_at = models.DateTimeField(null=True, blank=True)
+    esp_synced_at = models.DateTimeField("synced to email tool", null=True, blank=True)
+    esp_error = models.CharField(max_length=300, blank=True)
 
     class Meta:
         ordering = ["-created_at"]
 
     def __str__(self):
         return self.email
+
+    def unsubscribe_token(self):
+        from django.core import signing
+
+        return signing.dumps(self.email, salt="newsletter-unsubscribe")
+
+    def get_unsubscribe_url(self):
+        from django.urls import reverse
+
+        return reverse("marketing:unsubscribe", args=[self.unsubscribe_token()])
 
 
 class Coupon(TimeStampedModel):

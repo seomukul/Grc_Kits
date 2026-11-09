@@ -57,6 +57,8 @@ THIRD_PARTY_APPS = [
     "django_otp.plugins.otp_static",
     "django_htmx",
     "django_tailwind_cli",
+    "django_prose_editor",
+    "django.contrib.syndication",
 ]
 
 LOCAL_APPS = [
@@ -157,7 +159,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "assets"]
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = env.path("MEDIA_ROOT", default=BASE_DIR / "media")
 
 # Paid product files are never served from MEDIA_URL.
 # - Production: private Cloudflare R2 bucket (S3 API). Buyers get short-lived presigned URLs.
@@ -231,6 +233,13 @@ STRIPE_WEBHOOK_SECRET = env("STRIPE_WEBHOOK_SECRET", default="")
 STRIPE_CURRENCY = env("STRIPE_CURRENCY", default="usd")
 
 # ---------------------------------------------------------------------------
+# Email marketing (newsletter sync): mailerlite | brevo | mailchimp | "" (off)
+# ---------------------------------------------------------------------------
+ESP_PROVIDER = env("ESP_PROVIDER", default="")
+ESP_API_KEY = env("ESP_API_KEY", default="")
+ESP_LIST_ID = env("ESP_LIST_ID", default="")
+
+# ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
 LOGGING = {
@@ -288,6 +297,9 @@ UNFOLD = {
                 "separator": True,
                 "items": [
                     {"title": _("Blog posts"), "icon": "article", "link": reverse_lazy("admin:blog_post_changelist")},
+                    {"title": _("Blog categories"), "icon": "folder", "link": reverse_lazy("admin:blog_blogcategory_changelist")},
+                    {"title": _("Blog tags"), "icon": "sell", "link": reverse_lazy("admin:blog_tag_changelist")},
+                    {"title": _("Media library"), "icon": "photo_library", "link": reverse_lazy("admin:blog_mediaasset_changelist")},
                     {"title": _("Services"), "icon": "handshake", "link": reverse_lazy("admin:services_service_changelist")},
                     {"title": _("Leads (inquiries)"), "icon": "mail", "link": reverse_lazy("admin:services_serviceinquiry_changelist")},
                     {"title": _("Home page sections"), "icon": "dashboard_customize", "link": reverse_lazy("admin:pages_homesection_changelist")},

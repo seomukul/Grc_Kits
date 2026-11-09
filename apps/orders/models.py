@@ -42,6 +42,7 @@ class Order(TimeStampedModel):
     stripe_payment_intent_id = models.CharField(max_length=255, blank=True, db_index=True)
     invoice_url = models.URLField(max_length=500, blank=True)
     paid_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    reminder_sent_at = models.DateTimeField(null=True, blank=True, help_text="Abandoned-checkout reminder.")
 
     # First-touch attribution (traffic source) for reports.
     utm_source = models.CharField(max_length=100, blank=True)

@@ -1,0 +1,13 @@
+{% autoescape off %}Hi{% if order.name %} {{ order.name }}{% endif %},
+
+You started checking out at {{ SITE_NAME }} but didn't finish. Your cart is saved:
+
+{% for item in order.items.all %}- {{ item.product_title }} ({{ item.license_label }} license): ${{ item.unit_price }}
+{% endfor %}
+Pick up where you left off:
+{{ url }}
+
+Questions about licensing or which toolkit fits? Just reply to this email.
+
+– The {{ SITE_NAME }} team
+{% endautoescape %}

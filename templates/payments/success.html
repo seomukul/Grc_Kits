@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Thank you – {{ SITE_NAME }}{% endblock %}
+{% block extra_js %}
+{% if order and order.status == "paid" %}
+<script>
+  (function () {
+    const key = "grc_purchase_{{ order.number }}";
+    if (!window.grcTrack || sessionStorage.getItem(key)) return;  // send once per order
+    sessionStorage.setItem(key, "1");
+    grcTrack("purchase", {
+      transaction_id: "{{ order.short_number }}", currency: "{{ order.currency|upper }}", value: {{ order.total|floatformat:"2u" }},
+      {% if order.coupon_code %}coupon: "{{ order.coupon_code|escapejs }}",{% endif %}
+      items: [{% for item in order.items.all %}{item_id: "{{ item.product.slug }}", item_name: "{{ item.product_title|escapejs }}", item_variant: "{{ item.license_tier }}", price: {{ item.line_total|floatformat:"2u" }}, quantity: 1}{% if not forloop.last %},{% endif %}{% endfor %}]
+    });
+  })();
+</script>
+{% endif %}
+{% endblock %}
 {% block content %}
 <div class="container-page max-w-2xl py-20 text-center">
   <div class="mx-auto grid size-14 place-items-center rounded-full bg-emerald-100 text-2xl text-emerald-700">✓</div>

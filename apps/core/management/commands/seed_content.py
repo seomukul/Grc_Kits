@@ -288,6 +288,19 @@ REFUND_POLICY = """<p><em>Draft. Please have this reviewed before launch.</em></
 """
 
 
+BLOG_CATEGORIES = [
+    ("ISO 27001", "iso-27001"),
+    ("ISO 42001 / AI Governance", "ai-governance"),
+    ("Risk Management", "risk-management"),
+    ("IT Audit", "it-audit"),
+    ("Bangladesh Bank / BB CSF", "bb-csf"),
+    ("Network Security", "network-security"),
+    ("Compliance Tips", "compliance-tips"),
+    ("Templates & Tools", "templates-tools"),
+    ("News & Updates", "news"),
+]
+
+
 class Command(BaseCommand):
     help = "Create starter site content (services, home page, FAQs, legal drafts) without overwriting edits."
 
@@ -331,6 +344,12 @@ class Command(BaseCommand):
             if not is_new and "content goes here" in page.body:  # replace seed_demo placeholder only
                 page.body = body
                 page.save(update_fields=["body"])
+            created += is_new
+
+        from apps.blog.models import BlogCategory
+
+        for order, (name, slug) in enumerate(BLOG_CATEGORIES):
+            _, is_new = BlogCategory.objects.get_or_create(slug=slug, defaults={"name": name, "order": order})
             created += is_new
 
         self.stdout.write(self.style.SUCCESS(f"Site content ready ({created} new records)."))

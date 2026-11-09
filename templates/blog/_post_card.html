@@ -1,0 +1,12 @@
+<article class="card card-hover group flex flex-col overflow-hidden">
+  <a href="{{ post.get_absolute_url }}" tabindex="-1" aria-hidden="true">
+    {% if post.cover_image %}<img src="{{ post.cover_image.url }}" alt="" class="aspect-[16/9] w-full object-cover" loading="lazy">
+    {% else %}<div class="relative grid aspect-[16/9] place-items-center overflow-hidden bg-brand-900 px-6"><div class="absolute inset-3 border border-brand-400/25"></div><p class="relative text-center font-display text-lg leading-snug text-slate-100">{{ post.title|truncatewords:9 }}</p></div>{% endif %}
+  </a>
+  <div class="flex flex-1 flex-col p-6">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-600">{% if post.category %}{{ post.category.name }} · {% endif %}{{ post.reading_minutes }} min read</p>
+    <h3 class="mt-2 text-xl leading-snug text-slate-900"><a href="{{ post.get_absolute_url }}" class="hover:text-brand-700">{{ post.title }}</a></h3>
+    <p class="mt-2 line-clamp-3 flex-1 text-sm text-slate-600">{{ post.summary }}</p>
+    <p class="mt-4 text-xs text-slate-500">{{ post.published_at|date:"M j, Y" }}</p>
+  </div>
+</article>

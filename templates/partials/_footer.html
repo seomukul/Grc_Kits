@@ -34,7 +34,7 @@
   </div>
   <div class="border-t border-white/10">
     <div class="container-page flex flex-wrap items-center justify-between gap-3 py-6 text-xs text-slate-500">
-      <p>&copy; {% now "Y" %} GRCkits. All rights reserved.</p>
+      <p>&copy; {% now "Y" %} GRCkits. All rights reserved.{% if tracking_config %} · <button type="button" class="underline hover:text-brand-300" onclick="window.dispatchEvent(new Event('open-cookie-settings'))">Cookie settings</button>{% endif %}</p>
       <p>Secure checkout by Stripe · Instant download · Editable Word &amp; Excel</p>
     </div>
   </div>

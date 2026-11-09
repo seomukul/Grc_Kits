@@ -1,0 +1,13 @@
+<div id="post-grid">
+  {% if q %}<p class="mb-6 text-sm text-slate-500">{{ paginator.count }} result{{ paginator.count|pluralize }} for “{{ q }}”</p>{% endif %}
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {% for post in posts %}{% include "blog/_post_card.html" %}{% empty %}<p class="col-span-full py-12 text-center text-slate-500">No posts found.</p>{% endfor %}
+  </div>
+  {% if is_paginated %}
+  <nav class="mt-12 flex items-center justify-center gap-3" aria-label="Pagination">
+    {% if page_obj.has_previous %}<a class="btn-secondary" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}">Newer</a>{% endif %}
+    <span class="text-sm text-slate-500">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="btn-secondary" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}">Older</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>

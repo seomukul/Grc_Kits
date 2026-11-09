@@ -7,6 +7,7 @@
   {% if product.og_image %}<meta property="og:image" content="{{ SITE_URL }}{{ product.og_image.url }}">{% elif product.image %}<meta property="og:image" content="{{ SITE_URL }}{{ product.image.url }}">{% endif %}
   {% if not product.is_listed %}<meta name="robots" content="noindex">{% endif %}
 {% endblock %}
+{% block extra_js %}<script>window.grcTrack && grcTrack("view_item", {currency: "USD", value: {{ product.price|floatformat:"2u" }}, items: [{item_id: "{{ product.slug }}", item_name: "{{ product.title|escapejs }}", item_category: "{{ product.category.name|escapejs }}"}]});</script>{% endblock %}
 {% block content %}
 <div class="container-page pt-8">
   <nav class="text-xs uppercase tracking-[0.15em] text-slate-500" aria-label="Breadcrumb">
@@ -54,7 +55,8 @@
           <span class="text-xs uppercase tracking-wider text-slate-500">one-time</span>
         </div>
 
-        <form method="post" action="{% url 'orders:cart_add' product.slug %}" class="mt-6 space-y-4" x-data="{ loading: false }" @submit="loading = true">
+        <form method="post" action="{% url 'orders:cart_add' product.slug %}" class="mt-6 space-y-4" x-data="{ loading: false }"
+              @submit="loading = true; window.grcTrack && grcTrack('add_to_cart', {currency: 'USD', value: Number(prices[tier]), items: [{item_id: '{{ product.slug }}', item_name: '{{ product.title|escapejs }}', item_variant: tier}]})">
           {% csrf_token %}
           {% if license_options|length > 1 %}
           <fieldset class="space-y-2">

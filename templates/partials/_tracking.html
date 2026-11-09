@@ -1,0 +1,6 @@
+{# Search Console verification is a plain meta tag (no cookies). Everything else waits for consent. #}
+{% if site_settings.search_console_verification %}<meta name="google-site-verification" content="{{ site_settings.search_console_verification }}">{% endif %}
+{% if site_settings.ga4_measurement_id or site_settings.meta_pixel_id or site_settings.linkedin_partner_id %}
+{{ tracking_config|json_script:"tracking-config" }}
+<script src="{% load static %}{% static 'js/consent.js' %}"></script>
+{% endif %}

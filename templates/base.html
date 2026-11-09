@@ -16,9 +16,11 @@
   <link rel="preconnect" href="https://rsms.me/">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   {% tailwind_css %}
-  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
-  <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
+  {# Vendored, pinned: htmx 2.0.4, Alpine.js 3.14.8 (no third-party CDN at runtime). #}
+  <script src="{% static 'js/vendor/htmx.min.js' %}" defer></script>
+  <script src="{% static 'js/vendor/alpine.min.js' %}" defer></script>
   <script src="{% static 'js/app.js' %}" defer></script>
+  {% include "partials/_tracking.html" %}
   {% block extra_head %}{% endblock %}
 </head>
 <body class="flex min-h-full flex-col bg-slate-50 font-sans text-slate-800 antialiased" hx-boost="false">
@@ -32,6 +34,7 @@
   </main>
 
   {% include "partials/_footer.html" %}
+  {% include "partials/_cookie_banner.html" %}
   {% block extra_js %}{% endblock %}
 </body>
 </html>

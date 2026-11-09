@@ -72,9 +72,13 @@ class SiteSettingsAdmin(ModelAdmin):
         ("Downloads", {"fields": ("download_limit", "download_link_ttl_hours")}),
         ("License tiers", {"fields": ("team_price_multiplier", "organization_price_multiplier", "team_max_users")}),
         ("Storefront badges", {"fields": ("new_badge_days", "bestseller_min_sales")}),
-        ("Checkout", {"fields": ("stripe_invoices",)}),
+        ("Checkout", {"fields": ("stripe_invoices", "abandoned_cart_emails", "abandoned_cart_delay_hours")}),
         ("Contact & social", {"fields": ("contact_email", "response_time_note", "booking_url", "linkedin_url", "facebook_url", "x_url", "youtube_url")}),
         ("Newsletter lead magnet", {"fields": ("lead_magnet_title", "lead_magnet_file")}),
+        ("Analytics & tracking", {
+            "fields": ("ga4_measurement_id", "search_console_verification", "meta_pixel_id", "linkedin_partner_id"),
+            "description": "Tracking scripts load only after a visitor clicks Accept on the cookie banner.",
+        }),
     )
 
     def has_add_permission(self, request):

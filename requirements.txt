@@ -10,6 +10,8 @@ django-htmx>=1.19
 
 # Admin
 django-unfold>=0.50
+django-prose-editor>=0.28
+nh3>=0.2
 
 # Security (admin two-factor auth)
 django-otp>=1.5

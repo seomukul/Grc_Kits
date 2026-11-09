@@ -8,4 +8,6 @@ Here's your free download{% if lead_magnet_title %} ({{ lead_magnet_title }}){% 
 Browse all kits: {{ SITE_URL }}/kits/
 
 – The {{ SITE_NAME }} team
+
+Don't want these emails? Unsubscribe: {{ unsubscribe_url }}
 {% endautoescape %}

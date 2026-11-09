@@ -29,7 +29,7 @@ Status key: ✅ done in Sprint 0 · 🟡 partial · ⬜ not started
 | Products → Category → Product detail | 🟡 |
 | Bundles | ✅ (bundle products) |
 | Services → service detail | ✅ 6 services migrated + expanded, full detail layout |
-| Blog → Category → Post | 🟡 posts only, no blog categories |
+| Blog → Category → Post | ✅ categories + sub-categories, tags, search, RSS |
 | About Me | ✅ layout + admin profile (owner fills bio, photo, certs) |
 | Contact Us | ✅ lead form, spam protection, attachment, booking link |
 | My Library | ✅ magic-link sign-in, files + orders + invoices |
@@ -80,10 +80,10 @@ Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DS
 - ~~Stripe Tax~~ (owner decision: not used)
 
 ### 4.4 Marketing
-- 🟡 Email list ✅ · welcome email ✅ · export / Mailchimp-MailerLite-Brevo sync ⬜
+- ✅ Email list · welcome email · unsubscribe link · CSV export · MailerLite / Brevo / Mailchimp sync
 - 🟡 Free lead magnet (one sitewide file in Site settings; per-category later)
-- ⬜ Abandoned cart email · ✅ "customers also bought" on cart page
-- 🟡 Open Graph tags ✅ · share buttons ⬜
+- ✅ Abandoned checkout reminder (opt-in setting, one email, restore-cart link) · ✅ "customers also bought" on cart page
+- ✅ Open Graph tags · share buttons (blog)
 - ⬜ Affiliate program (later)
 
 ## 5. Admin analytics dashboard (most important admin feature)
@@ -99,9 +99,9 @@ Management screens: ✅ Products (duplicate/archive/versions) · ✅ Orders (res
 
 ## 6. Blog
 
-✅ Posts, SEO meta, sitemap, related products · ⬜ categories + sub-categories (create/rename/reorder) · ⬜ tags · ⬜ featured image ✅/author box ⬜ · ⬜ reading time · ⬜ rich-text editor (headings, tables, images, code, video, attachments) · 🟡 Draft/Published ✅, Scheduled ⬜ · ⬜ canonical + OG image per post · ⬜ TOC, related posts, share buttons · ⬜ category pages + search · 🟡 product CTA blocks (related products ✅) · ⬜ newsletter box per post · comments OFF · ⬜ RSS.
+✅ Categories + sub-categories (create/rename/reorder) · ✅ tags · ✅ featured image + author box · ✅ reading time · ✅ rich-text editor (headings, tables, images via media library, code blocks, embedded YouTube/Vimeo, downloadable attachments; HTML sanitized with nh3) · ✅ Draft / Scheduled / Published · ✅ SEO per post (meta, canonical, OG image, JSON-LD) + sitemap · ✅ TOC on long posts, related posts, share buttons · ✅ category / tag pages and search · ✅ product + service CTA blocks · ✅ newsletter box per post · comments OFF · ✅ RSS + Atom.
 
-Starting categories: ISO 27001 · ISO 42001 / AI Governance · Risk Management · IT Audit · Bangladesh Bank / BB CSF · Network Security · Compliance Tips · Templates & Tools · News & Updates.
+Starting categories (seeded): ISO 27001 · ISO 42001 / AI Governance · Risk Management · IT Audit · Bangladesh Bank / BB CSF · Network Security · Compliance Tips · Templates & Tools · News & Updates.
 
 ## 7. Services
 
@@ -114,7 +114,7 @@ Starting categories: ISO 27001 · ISO 42001 / AI Governance · Risk Management �
 
 - About Me (bio, certifications, experience, photo, LinkedIn) · Contact Us (form + spam protection, response-time note)
 - Legal: Privacy, Terms, Refund, **License terms** (single-user vs team/org, no resale)
-- Owner ideas: product previews · lifetime updates + "new version" email · testimonial wall · blog → product/service cross-promotion · i18n-ready (English first; Bangla/Arabic later) · GA4 + Search Console + conversion pixels · automated backups + uptime monitoring · anti-piracy (expiring links, limits, optional PDF watermark with buyer email) · "vote for the next toolkit" request page.
+- Owner ideas (Sprint 5 ✅: GA4 + Search Console + Meta/LinkedIn pixels behind a cookie-consent banner, purchase/checkout events; automated backups + uptime monitoring documented in docs/DEPLOY.md): product previews · lifetime updates + "new version" email · testimonial wall · blog → product/service cross-promotion · i18n-ready (English first; Bangla/Arabic later) · GA4 + Search Console + conversion pixels · automated backups + uptime monitoring · anti-piracy (expiring links, limits, optional PDF watermark with buyer email) · "vote for the next toolkit" request page.
 
 ---
 

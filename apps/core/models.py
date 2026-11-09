@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
 from django.db import models
 
 
@@ -16,6 +17,11 @@ class User(AbstractUser):
     email = models.EmailField("email address", unique=True)
     company = models.CharField(max_length=200, blank=True)
     stripe_customer_id = models.CharField(max_length=100, blank=True)
+
+    # Shown in the blog author box.
+    bio = models.TextField(blank=True)
+    avatar = models.ImageField(upload_to="avatars/", blank=True)
+    linkedin_url = models.URLField(blank=True)
 
     def __str__(self):
         return self.email or self.username
@@ -45,6 +51,13 @@ class SiteSettings(models.Model):
         help_text="Have Stripe create a PDF invoice for every order (Stripe charges a small invoicing fee).",
     )
 
+    # Abandoned checkout reminders
+    abandoned_cart_emails = models.BooleanField(
+        default=False,
+        help_text="Email people who started checkout but didn't pay (one reminder). Check this is allowed where you sell.",
+    )
+    abandoned_cart_delay_hours = models.PositiveIntegerField(default=2)
+
     # Contact & social
     contact_email = models.EmailField(default="hello@grckits.com")
     response_time_note = models.CharField(max_length=120, default="We reply within one business day.")
@@ -54,6 +67,22 @@ class SiteSettings(models.Model):
     youtube_url = models.URLField(blank=True)
     booking_url = models.URLField(
         blank=True, help_text="Calendly or Cal.com link for discovery calls (shown on service and contact pages)."
+    )
+
+    # Analytics & tracking (loaded only after the visitor accepts cookies)
+    ga4_measurement_id = models.CharField(
+        "GA4 measurement ID", max_length=20, blank=True, help_text="e.g. G-XXXXXXXXXX",
+        validators=[RegexValidator(r"^G-[A-Z0-9]{4,16}$", "Looks like G-XXXXXXXXXX")],
+    )
+    search_console_verification = models.CharField(
+        max_length=100, blank=True, help_text="Only the content value of Google's <meta name=\"google-site-verification\"> tag.",
+        validators=[RegexValidator(r"^[A-Za-z0-9_-]+$", "Paste only the token value.")],
+    )
+    meta_pixel_id = models.CharField(
+        "Meta pixel ID", max_length=20, blank=True, validators=[RegexValidator(r"^\d{6,20}$", "Digits only.")]
+    )
+    linkedin_partner_id = models.CharField(
+        "LinkedIn Insight partner ID", max_length=20, blank=True, validators=[RegexValidator(r"^\d{3,20}$", "Digits only.")]
     )
 
     # Newsletter lead magnet

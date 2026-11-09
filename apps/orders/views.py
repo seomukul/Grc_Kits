@@ -116,3 +116,27 @@ def cart_coupon(request):
             messages.error(request, error)
             return redirect("orders:cart")
     return _cart_changed(request, cart, "Coupon updated.")
+
+
+@require_GET
+def cart_restore(request, token):
+    """Link from the abandoned-checkout email: refill the cart from that order."""
+    from django.core import signing
+
+    from .abandoned import SALT
+
+    try:
+        number = signing.loads(token, salt=SALT, max_age=60 * 60 * 24 * 14)
+    except signing.BadSignature:
+        messages.error(request, "That link has expired. Your items may still be available in the shop.")
+        return redirect("catalog:list")
+    order = get_object_or_404(Order.objects.prefetch_related("items__product"), number=number)
+    cart = Cart(request)
+    for item in order.items.all():
+        try:
+            cart.add(item.product, item.license_tier)
+        except ValueError:
+            continue
+    if order.coupon_code:
+        cart.set_coupon(order.coupon_code)
+    return redirect("orders:cart")

@@ -154,7 +154,6 @@ An editorial, "auditor-grade" look: midnight navy, gold and warm paper, with ser
 - **Tailwind v4** is configured in CSS (`frontend/tailwind.css`, `@theme`), not in a JS config. Brand colours are `brand-*` and `accent-*`. Shared utilities are `btn-primary`, `btn-secondary`, `card` and `container-page`.
 - **HTMX:** views check `request.htmx` (django-htmx) and return a `_partial.html` for HTMX requests. `assets/js/app.js` adds the CSRF header to every HTMX request.
 - **Alpine:** use it for small client-side state (mobile nav, toggles, button loading states). Put shared state in `Alpine.store("ui")`.
-- HTMX and Alpine load from unpkg with pinned versions. Before launch, consider vendoring them into `assets/js/vendor/`, or add SRI hashes.
 
 ## Admin: sales dashboard, customers, roles, 2FA
 
@@ -164,7 +163,19 @@ An editorial, "auditor-grade" look: midnight navy, gold and warm paper, with ser
 - **Two-factor authentication:** when `ADMIN_2FA_REQUIRED=True` (the production default), every staff member scans a QR code with an authenticator app at first login and gets 8 one-time backup codes. If someone loses their phone, use Admin → Users → *Reset two-factor*. In local dev it's off unless you set it in `.env`.
 - **Demo data for the dashboard (dev only):** `python manage.py seed_sales` creates 150 fake orders.
 
+## Blog, marketing and analytics
+
+- **Blog:** categories (nested), tags, a rich-text editor (headings, tables, images, code, links), video embeds (paste a YouTube or Vimeo link on its own line), attachments, and Draft / Scheduled / Published status. Scheduled posts go live on their own, no cron needed. You also get reading time, an automatic table of contents (3+ headings), related posts, product and service CTAs, share buttons, RSS at `/blog/feed/` and Atom at `/blog/feed/atom/`, and JSON-LD. Staff can preview drafts. HTML is sanitized with nh3 on save and again on render.
+- **Media library:** upload images in Admin → Media library, then paste the URL into the editor's image button.
+- **Newsletter:** welcome email with an unsubscribe link and a `List-Unsubscribe` header, CSV export, and optional sync to MailerLite, Brevo or Mailchimp (`ESP_PROVIDER`, `ESP_API_KEY`, `ESP_LIST_ID`). To retry failed syncs run `python manage.py sync_subscribers`.
+- **Abandoned checkout:** one reminder email with a restore-cart link (`send_abandoned_cart_emails`, run hourly). It's off until you enable it in Site settings, and it skips buyers and anyone who unsubscribed.
+- **Analytics:** set the GA4 ID, Search Console token, and Meta or LinkedIn IDs in Site settings. Tracking scripts load only after the visitor clicks *Accept* on the cookie banner. Events sent: `view_item`, `add_to_cart`, `begin_checkout`, `purchase` (once per order).
+- **No CDN at runtime:** HTMX and Alpine are vendored in `assets/js/vendor/`.
+
 ## Deployment notes
+
+Full step-by-step VPS guide: **[docs/DEPLOY.md](docs/DEPLOY.md)** (nginx, gunicorn/systemd, HTTPS, cron, backups to R2, uptime, launch checklist). Config files are in `deploy/`.
+
 
 ```bash
 DJANGO_SETTINGS_MODULE=config.settings.prod
@@ -228,6 +239,14 @@ gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
 - [x] Editor role (blog only) and permission-aware admin sidebar
 - [x] Staff two-factor authentication (TOTP + backup codes)
 - [x] Admin themed in GRCkits gold
+
+## Sprint 5: done
+
+- [x] Blog: nested categories, tags, rich-text editor (sanitized), scheduling, TOC, embeds, attachments, RSS/Atom, share, author box, CTAs, search
+- [x] Newsletter: unsubscribe flow, ESP sync (MailerLite/Brevo/Mailchimp), CSV export
+- [x] Abandoned-checkout reminders with restore-cart link
+- [x] GA4, Search Console, Meta/LinkedIn pixels behind cookie consent; e-commerce events
+- [x] Vendored HTMX/Alpine; Sentry hook; deploy kit (nginx, systemd, cron, backups) and VPS guide
 
 ## Next sprints (suggested)
 

@@ -1,0 +1,26 @@
+# /etc/systemd/system/grckits.service
+[Unit]
+Description=GRCkits (gunicorn)
+After=network.target postgresql.service
+
+[Service]
+User=grckits
+Group=www-data
+WorkingDirectory=/srv/grckits/app
+EnvironmentFile=/srv/grckits/app/.env
+Environment=DJANGO_SETTINGS_MODULE=config.settings.prod
+RuntimeDirectory=grckits
+ExecStart=/srv/grckits/venv/bin/gunicorn config.wsgi:application \
+    --bind unix:/run/grckits/gunicorn.sock \
+    --workers 3 --threads 2 --timeout 60 \
+    --access-logfile - --error-logfile -
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

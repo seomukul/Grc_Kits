@@ -1,0 +1,10 @@
+{% if tracking_config %}
+<div x-data="cookieConsent" x-cloak x-show="open" x-transition role="dialog" aria-live="polite" aria-label="Cookie preferences"
+     class="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-3xl rounded-md border border-brand-400/40 bg-brand-900 p-5 text-sm text-slate-300 shadow-2xl sm:flex sm:items-center sm:gap-6">
+  <p class="flex-1">We'd like to use analytics cookies to understand how the site is used and improve it. Essential cookies (cart, sign-in) are always on. <a href="/privacy/" class="text-brand-300 underline">Privacy policy</a></p>
+  <div class="mt-4 flex shrink-0 gap-2 sm:mt-0">
+    <button type="button" @click="reject()" class="btn-ghost-light !py-2">Reject</button>
+    <button type="button" @click="accept()" class="btn-primary !py-2">Accept</button>
+  </div>
+</div>
+{% endif %}
