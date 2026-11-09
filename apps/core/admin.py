@@ -26,3 +26,26 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
 @admin.register(Group)
 class GroupAdmin(BaseGroupAdmin, ModelAdmin):
     pass
+
+
+from .models import SiteSettings  # noqa: E402
+
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(ModelAdmin):
+    fieldsets = (
+        ("Downloads", {"fields": ("download_limit", "download_link_ttl_hours")}),
+        ("License tiers", {"fields": ("team_price_multiplier", "organization_price_multiplier", "team_max_users")}),
+        ("Storefront badges", {"fields": ("new_badge_days", "bestseller_min_sales")}),
+    )
+
+    def has_add_permission(self, request):
+        return not SiteSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        from django.shortcuts import redirect
+
+        return redirect("admin:core_sitesettings_change", SiteSettings.load().pk)

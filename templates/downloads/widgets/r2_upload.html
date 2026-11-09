@@ -1,0 +1,48 @@
+<div class="r2-upload" data-presign-url="{% url 'downloads:presign_upload' %}">
+  <input type="hidden" name="{{ widget.name }}" value="{{ widget.value|default:'' }}" class="r2-key">
+  <input type="file" class="r2-file block w-full text-sm">
+  <div class="r2-progress mt-2 hidden h-2 w-full overflow-hidden rounded bg-gray-200"><div class="h-2 bg-primary-600" style="width:0%"></div></div>
+  <p class="r2-status mt-1 text-xs text-gray-500">Uploads go straight to Cloudflare R2 (up to 5 GB).</p>
+</div>
+<script>
+(function () {
+  if (window.__r2UploadInit) return;
+  window.__r2UploadInit = true;
+  function csrf() { return (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || ""; }
+  let pending = 0;
+  document.addEventListener("submit", function (e) {
+    if (pending > 0) { e.preventDefault(); alert("Please wait for the upload to finish."); }
+  }, true);
+  document.addEventListener("change", async function (e) {
+    if (!e.target.classList.contains("r2-file")) return;
+    const box = e.target.closest(".r2-upload"), file = e.target.files[0];
+    if (!file) return;
+    const status = box.querySelector(".r2-status"), bar = box.querySelector(".r2-progress");
+    const body = new FormData();
+    body.append("filename", file.name); body.append("size", file.size);
+    body.append("content_type", file.type || "application/octet-stream");
+    status.textContent = "Preparing upload…";
+    const res = await fetch(box.dataset.presignUrl, { method: "POST", body, headers: { "X-CSRFToken": csrf() } });
+    if (!res.ok) { status.textContent = "Could not start upload: " + await res.text(); return; }
+    const { url, key, content_type } = await res.json();
+    pending++; bar.classList.remove("hidden");
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", url); xhr.setRequestHeader("Content-Type", content_type);
+    xhr.upload.onprogress = (ev) => {
+      if (!ev.lengthComputable) return;
+      const pct = Math.round((ev.loaded / ev.total) * 100);
+      bar.firstElementChild.style.width = pct + "%";
+      status.textContent = "Uploading… " + pct + "%";
+    };
+    xhr.onload = () => {
+      pending--;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        box.querySelector(".r2-key").value = key;
+        status.textContent = "Uploaded " + file.name + ". Save to finish.";
+      } else { status.textContent = "Upload failed (" + xhr.status + "). Check the R2 CORS settings."; }
+    };
+    xhr.onerror = () => { pending--; status.textContent = "Upload failed. Check the R2 CORS settings."; };
+    xhr.send(file);
+  });
+})();
+</script>

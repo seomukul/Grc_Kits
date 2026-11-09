@@ -8,7 +8,7 @@ class ProductSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return Product.objects.published()
+        return Product.objects.listed()
 
     def lastmod(self, obj):
         return obj.updated_at

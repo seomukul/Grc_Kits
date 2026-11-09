@@ -9,7 +9,7 @@ from .models import Page
 
 def home(request):
     ctx = {
-        "featured_products": Product.objects.published().filter(is_featured=True).select_related("category")[:6],
+        "featured_products": Product.objects.listed().filter(is_featured=True).select_related("category")[:6],
         "frameworks": Framework.objects.all()[:12],
         "services": Service.objects.filter(is_active=True)[:3],
         "latest_posts": Post.objects.published()[:3],

@@ -74,6 +74,30 @@ assets/            STATICFILES_DIRS: js/app.js; css/tailwind.css is generated (g
 private_media/     paid files, never publicly served (gitignored)
 ```
 
+## Cloudflare R2 (paid product files)
+
+Paid files are stored in a **private** R2 bucket in production. Locally, if `R2_BUCKET_NAME` is empty, they go to `private_media/` instead.
+
+1. Cloudflare dashboard → R2 → **Create bucket**, e.g. `grckits-files`. Don't connect a public domain to it.
+2. R2 → **Manage API tokens** → create a token with *Object Read & Write* on that bucket only. Put the Account ID, Access Key ID and Secret in `.env` (`R2_*`).
+3. Bucket → Settings → **CORS policy**. This lets the admin upload files straight from the browser:
+
+   ```json
+   [{"AllowedOrigins": ["https://grckits.com"], "AllowedMethods": ["PUT"], "AllowedHeaders": ["Content-Type"], "MaxAgeSeconds": 3600}]
+   ```
+
+With R2 enabled:
+- **Admin uploads:** files (up to 5 GB) go directly to R2 through a presigned URL, so they never pass through Django or the VPS.
+- **Buyer downloads:** buyers are redirected to a presigned URL that's valid for 5 minutes.
+
+## Products, licenses and bundles
+
+- **Status:** Draft, Published, Hidden (reachable only by direct link, never listed), or Scheduled (goes live at `publish_at`).
+- **License tiers:** Single user always uses the product price. Add Team or Organization rows in the product's *Extra license tiers* inline. If you leave the price blank, it's calculated from the multiplier in **Admin → Site settings** (default ×2 and ×4).
+- **Bundles:** set the product type to *Bundle* and pick the included products. A buyer gets one entitlement for each included product.
+- **Files and versions:** every product has one or more *files*. Open a file to upload new *versions* with a changelog. Buyers always get the latest version. The "Email buyers about latest version" action sends each buyer a fresh link.
+- **Site settings** (admin): download limit per file (default 5), link lifetime (default 24 h), tier multipliers, and the thresholds for the New and Bestseller badges.
+
 ## How purchase and delivery work
 
 1. **Buy now** (`POST /checkout/<slug>/`) creates a `pending` Order and redirects to Stripe-hosted Checkout. The price comes from the database through `price_data`, so you don't have to create Stripe Price objects.
@@ -82,7 +106,7 @@ private_media/     paid files, never publicly served (gitignored)
    - stores the event in `StripeEvent` (its unique `event_id` makes retries harmless);
    - marks the order `paid` and creates one `Entitlement` per item;
    - after commit, emails the download links.
-3. Buyers download through `/downloads/<token>/`. Files are streamed from `PRIVATE_MEDIA_ROOT` only while the order is paid, the link hasn't expired, and the download limit hasn't been reached.
+3. Buyers download through **signed links** (`/downloads/<signed>/`) that expire after the *link lifetime* (24 h by default). A file can be downloaded until the per-file limit is reached, and every download is recorded in `DownloadLog`. A refunded order or a revoked entitlement blocks downloads immediately. Logged-in customers get fresh links from `/dashboard/`.
 4. The success page never fulfils anything. It only polls with HTMX until the webhook has marked the order paid.
 
 The webhook also handles these events: `async_payment_succeeded`, `async_payment_failed`, `session.expired` and `charge.refunded`.
@@ -121,6 +145,17 @@ gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
 - [x] Stripe Checkout + idempotent webhook + private, tokenised downloads + email
 - [x] Sitemap, robots.txt, canonical/OG tags, health check
 - [x] Tests for the checkout → webhook → download flow
+
+## Sprint 1: done
+
+- [x] Product status (draft/published/hidden/scheduled), types (Excel/Word/PDF/Bundle), gallery, preview video, sample file, system requirements, OG image
+- [x] License tiers (Single/Team/Organization) with Site-settings multipliers
+- [x] Bundles with savings display
+- [x] Files with version history, changelog and "new version" buyer emails
+- [x] Signed 24 h download links, per-file download limit, download log
+- [x] Cloudflare R2 private storage with direct browser uploads
+- [x] Shop filters (framework, type, price, rating), sorting, New/Bestseller/Sale badges, related products
+- [x] Verified-buyer-only reviews, download buttons on the confirmation page
 
 ## Next sprints (suggested)
 

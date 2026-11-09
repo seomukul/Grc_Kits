@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
-from apps.catalog.models import Product
+from apps.catalog.models import LicenseTier, Product, cents
 from apps.orders.models import Order
 from apps.orders.services import create_order_for_product, mark_order_paid
 
@@ -23,8 +23,14 @@ logger = logging.getLogger(__name__)
 @require_POST
 def create_checkout_session(request, slug):
     """Create a pending Order and redirect the buyer to Stripe-hosted Checkout."""
-    product = get_object_or_404(Product.objects.published(), slug=slug)
-    order = create_order_for_product(product, user=request.user)
+    product = get_object_or_404(Product.objects.purchasable(), slug=slug)
+    tier = request.POST.get("license", LicenseTier.SINGLE)
+    try:
+        order = create_order_for_product(product, user=request.user, license_tier=tier)
+    except ValueError:
+        messages.error(request, "Please choose a valid license.")
+        return redirect(product.get_absolute_url())
+    item = order.items.get()
 
     params = {
         "mode": "payment",
@@ -33,8 +39,11 @@ def create_checkout_session(request, slug):
                 "quantity": 1,
                 "price_data": {
                     "currency": product.currency,
-                    "unit_amount": product.price_cents,
-                    "product_data": {"name": product.title, "description": product.short_description[:300]},
+                    "unit_amount": cents(item.unit_price),
+                    "product_data": {
+                        "name": f"{product.title} – {item.license_label} license",
+                        "description": product.short_description[:300],
+                    },
                 },
             }
         ],
@@ -42,7 +51,6 @@ def create_checkout_session(request, slug):
         "metadata": {"order_number": str(order.number)},
         "success_url": settings.SITE_URL + reverse("payments:success") + "?session_id={CHECKOUT_SESSION_ID}",
         "cancel_url": settings.SITE_URL + reverse("payments:cancel") + f"?order={order.number}",
-        "allow_promotion_codes": True,
     }
     if order.email:
         params["customer_email"] = order.email
@@ -73,7 +81,7 @@ def checkout_success(request):
     """Shown after Stripe redirects back. Fulfilment happens in the webhook, not here."""
     order = None
     if session_id := request.GET.get("session_id"):
-        order = Order.objects.filter(stripe_checkout_session_id=session_id).prefetch_related("items").first()
+        order = Order.objects.filter(stripe_checkout_session_id=session_id).prefetch_related("items__entitlements__product").first()
     return render(request, "payments/success.html", {"order": order})
 
 

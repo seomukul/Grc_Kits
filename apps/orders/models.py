@@ -51,11 +51,18 @@ class OrderItem(models.Model):
     product = models.ForeignKey("catalog.Product", on_delete=models.PROTECT, related_name="order_items")
     # Snapshot so later product edits don't rewrite order history.
     product_title = models.CharField(max_length=200)
+    license_tier = models.CharField(max_length=20, default="single")
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
-        return f"{self.product_title} × {self.quantity}"
+        return f"{self.product_title} ({self.license_label}) × {self.quantity}"
+
+    @property
+    def license_label(self):
+        from apps.catalog.models import LicenseTier
+
+        return LicenseTier(self.license_tier).label
 
     @property
     def line_total(self):

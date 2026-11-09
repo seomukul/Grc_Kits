@@ -148,19 +148,48 @@ STATICFILES_DIRS = [BASE_DIR / "assets"]
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Paid product files are never served from MEDIA_URL. They live outside the
-# public media root and are streamed by apps.downloads after an entitlement check.
+# Paid product files are never served from MEDIA_URL.
+# - Production: private Cloudflare R2 bucket (S3 API). Buyers get short-lived presigned URLs.
+# - Local dev / no R2 configured: a folder outside MEDIA_ROOT, streamed by apps.downloads.
+R2_ACCOUNT_ID = env("R2_ACCOUNT_ID", default="")
+R2_ACCESS_KEY_ID = env("R2_ACCESS_KEY_ID", default="")
+R2_SECRET_ACCESS_KEY = env("R2_SECRET_ACCESS_KEY", default="")
+R2_BUCKET_NAME = env("R2_BUCKET_NAME", default="")
+USE_R2 = bool(R2_BUCKET_NAME and R2_ACCOUNT_ID)
+
 PRIVATE_MEDIA_ROOT = env.path("PRIVATE_MEDIA_ROOT", default=BASE_DIR / "private_media")
+
+if USE_R2:
+    PRIVATE_STORAGE = {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": R2_BUCKET_NAME,
+            "endpoint_url": f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
+            "access_key": R2_ACCESS_KEY_ID,
+            "secret_key": R2_SECRET_ACCESS_KEY,
+            "region_name": "auto",
+            "signature_version": "s3v4",
+            "addressing_style": "path",
+            "default_acl": None,  # R2 has no ACLs; the bucket itself is private
+            "querystring_auth": True,
+            "querystring_expire": 300,
+            "file_overwrite": False,
+        },
+    }
+else:
+    PRIVATE_STORAGE = {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {"location": str(PRIVATE_MEDIA_ROOT), "base_url": None},
+    }
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "private": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-        "OPTIONS": {"location": str(PRIVATE_MEDIA_ROOT), "base_url": None},
-    },
+    "private": PRIVATE_STORAGE,
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
 
+# Files above this go to a temp file on disk instead of memory during local uploads.
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
 # ---------------------------------------------------------------------------
@@ -189,12 +218,6 @@ STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY", default="")
 STRIPE_PUBLISHABLE_KEY = env("STRIPE_PUBLISHABLE_KEY", default="")
 STRIPE_WEBHOOK_SECRET = env("STRIPE_WEBHOOK_SECRET", default="")
 STRIPE_CURRENCY = env("STRIPE_CURRENCY", default="usd")
-
-# ---------------------------------------------------------------------------
-# Downloads
-# ---------------------------------------------------------------------------
-DOWNLOAD_LINK_MAX_USES = env.int("DOWNLOAD_LINK_MAX_USES", default=10)
-DOWNLOAD_LINK_EXPIRY_DAYS = env.int("DOWNLOAD_LINK_EXPIRY_DAYS", default=365)
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -270,6 +293,7 @@ UNFOLD = {
                 "items": [
                     {"title": _("Users"), "icon": "person", "link": reverse_lazy("admin:core_user_changelist")},
                     {"title": _("Stripe events"), "icon": "webhook", "link": reverse_lazy("admin:payments_stripeevent_changelist")},
+                    {"title": _("Site settings"), "icon": "settings", "link": reverse_lazy("admin:core_sitesettings_changelist")},
                 ],
             },
         ],

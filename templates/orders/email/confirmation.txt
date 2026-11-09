@@ -1,12 +1,14 @@
 {% autoescape off %}Thanks for your purchase from {{ SITE_NAME }}!
 
 Order: {{ order.short_number }}
-Total: ${{ order.total }} {{ order.currency|upper }}
+{% for item in order.items.all %}- {{ item.product_title }} ({{ item.license_label }} license): ${{ item.line_total }}
+{% endfor %}Total: ${{ order.total }} {{ order.currency|upper }}
 
-Your downloads:
+Download your files (links valid for {{ ttl_hours }} hours):
 {% for ent in entitlements %}- {{ ent.product.title }}: {{ SITE_URL }}{{ ent.get_absolute_url }}
 {% endfor %}
-Keep this email: the links above are your access to the files.
+After that, log in to your account at {{ SITE_URL }}/dashboard/ to get fresh links at any time.
+Your purchase includes free updates; we'll email you when a new version is out.
 
 – The {{ SITE_NAME }} team
 {% endautoescape %}

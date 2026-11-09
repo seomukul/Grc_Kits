@@ -27,7 +27,7 @@ Status key: ✅ done in Sprint 0 · 🟡 partial · ⬜ not started
 |---|---|
 | Home | 🟡 basic sections; needs slider, sections CMS (§3) |
 | Products → Category → Product detail | 🟡 |
-| Bundles | ⬜ |
+| Bundles | ✅ (bundle products) |
 | Services → service detail | 🟡 model + inquiry form; content from cyberprolab.com/services not migrated |
 | Blog → Category → Post | 🟡 posts only, no blog categories |
 | About Me | 🟡 generic CMS page; needs bio/certs/photo layout |
@@ -47,30 +47,30 @@ Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DS
 
 ### 4.1 Admin fields
 - ✅ Title, slug, short + long description · ⬜ rich-text editor
-- 🟡 Cover image · ⬜ gallery images · ⬜ preview video
-- ✅ Price (USD) · ⬜ **license tiers: Single user / Team / Organization pricing** (owner idea #3)
-- ✅ Category · ✅ framework tags (M2M) · 🟡 product type → change to *Excel tool, Word template, PDF, Bundle*
-- 🟡 Multiple downloadable files (ZIP/XLSX/DOCX/PDF) · ⬜ **≥ 500 MB** uploads (needs object storage + direct upload)
-- 🟡 Version number · ⬜ changelog, version history, "new version" email to past buyers
-- ✅ What's included · ⬜ system requirements · ⬜ sample preview (PDF/screenshots)
-- 🟡 Status: has active flag only → needs **Draft / Published / Hidden (unlisted) / Scheduled**
-- ✅ Featured · ⬜ Bestseller (auto) · ⬜ New (auto)
-- 🟡 SEO: meta title/description ✅, social share image ⬜
-- ⬜ Duplicate / archive product
+- ✅ Cover image · ✅ gallery images · ✅ preview video
+- ✅ Price (USD) · ✅ **license tiers: Single user / Team / Organization pricing** (owner idea #3)
+- ✅ Category · ✅ framework tags (M2M) · ✅ product type: *Excel tool, Word template, PDF, Bundle*
+- ✅ Multiple downloadable files (ZIP/XLSX/DOCX/PDF) · ✅ **≥ 500 MB** uploads (R2 direct upload)
+- ✅ Version number · ✅ changelog, version history, "new version" email to past buyers
+- ✅ What's included · ✅ system requirements · ✅ sample preview (PDF/screenshots)
+- ✅ Status: **Draft / Published / Hidden (unlisted) / Scheduled**
+- ✅ Featured · ✅ Bestseller (auto) · ✅ New (auto)
+- ✅ SEO: meta title/description, social share image
+- ✅ Duplicate product · ✅ archive (Draft/Hidden)
 
 ### 4.2 Storefront
-- 🟡 Filters: category ✅, framework ✅, price range ⬜, rating ⬜ · ⬜ sorting (newest, popular, price)
+- ✅ Filters: category, framework, type, price range, rating · ✅ sorting (newest, popular, price, rating)
 - 🟡 Search (HTMX) · ⬜ suggestions/autocomplete
-- 🟡 Detail page: price, buy, description, included, reviews ✅ · gallery, preview, FAQ, related products ⬜
-- 🟡 Reviews: moderation ✅ · **verified buyers only** ⬜ (currently any logged-in user, flag only)
-- ⬜ Bundles (discounted packs, framework "Complete Toolkit")
+- 🟡 Detail page: price, buy, description, included, reviews, gallery, preview, related products ✅ · FAQ ⬜
+- ✅ Reviews: moderation · **verified buyers only**
+- ✅ Bundles (discounted packs, framework "Complete Toolkit")
 - 🟡 Coupons: Stripe promotion codes allowed at checkout · ⬜ own Coupon model (percent/fixed, expiry, usage limit, per-product or sitewide)
 - ⬜ Wishlist (optional) · ⬜ Recently viewed
 
 ### 4.3 Purchase & delivery
 - ✅ Guest checkout (name + email only)
-- 🟡 Instant delivery: email link ✅ · download button on confirmation page ⬜
-- 🟡 Secure downloads: files never public ✅ · download limit ✅ (default 10 → **brief: 5, admin-configurable**) · **signed links valid 24 h** ⬜ (currently the entitlement link lasts 365 days)
+- ✅ Instant delivery: email link · download button on confirmation page
+- ✅ Secure downloads: files never public · download limit 5 per file (Site settings) · **signed links valid 24 h** · download log
 - ⬜ My Library via **magic link / one-time code** (no password)
 - ⬜ Receipt / invoice PDF with order number (Stripe Checkout `invoice_creation` can do this)
 - 🟡 Refund disables downloads ✅ (via `charge.refunded`) · admin "mark refunded" action ⬜ · disputes ⬜

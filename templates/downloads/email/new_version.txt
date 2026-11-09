@@ -1,0 +1,14 @@
+{% autoescape off %}Good news: there's a new version of {{ product.title }}.
+
+{{ product_file.title }}: version {{ version.version }}
+{% if version.changelog %}
+What's new:
+{{ version.changelog }}
+{% endif %}
+Download it here (link valid for {{ ttl_hours }} hours):
+{{ link }}
+
+Your purchase includes free updates.
+
+– The {{ SITE_NAME }} team
+{% endautoescape %}

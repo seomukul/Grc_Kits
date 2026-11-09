@@ -2,8 +2,8 @@
   {% csrf_token %}
   <div><label for="id_rating">Rating</label>
     <select name="rating" id="id_rating">{% for i in "54321" %}<option value="{{ i }}">{{ i }} ★</option>{% endfor %}</select>
-    {{ form.rating.errors }}</div>
-  <div><label for="id_title">Title</label><input id="id_title" name="title" maxlength="120" required value="{{ form.title.value|default:'' }}">{{ form.title.errors }}</div>
-  <div><label for="id_body">Review</label><textarea id="id_body" name="body" rows="4" required>{{ form.body.value|default:'' }}</textarea>{{ form.body.errors }}</div>
+    {{ review_form.rating.errors }}</div>
+  <div><label for="id_title">Title</label><input id="id_title" name="title" maxlength="120" required value="{{ review_form.title.value|default:'' }}">{{ review_form.title.errors }}</div>
+  <div><label for="id_body">Review</label><textarea id="id_body" name="body" rows="4" required>{{ review_form.body.value|default:'' }}</textarea>{{ review_form.body.errors }}</div>
   <button class="btn-primary">Submit review <span class="htmx-indicator">…</span></button>
 </form>

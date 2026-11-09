@@ -1,23 +1,65 @@
 {% extends "base.html" %}
+{% load catalog_tags %}
 {% block title %}{{ product.meta_title|default:product.title }} – {{ SITE_NAME }}{% endblock %}
 {% block meta_description %}{{ product.meta_description|default:product.short_description }}{% endblock %}
 {% block og_title %}{{ product.title }}{% endblock %}
+{% block extra_head %}
+  {% if product.og_image %}<meta property="og:image" content="{{ SITE_URL }}{{ product.og_image.url }}">{% elif product.image %}<meta property="og:image" content="{{ SITE_URL }}{{ product.image.url }}">{% endif %}
+  {% if not product.is_listed %}<meta name="robots" content="noindex">{% endif %}
+{% endblock %}
 {% block content %}
 <div class="container-page py-12">
   <nav class="text-sm text-slate-500"><a href="{% url 'catalog:list' %}" class="hover:underline">Kits</a> / <a href="{{ product.category.get_absolute_url }}" class="hover:underline">{{ product.category.name }}</a></nav>
 
-  <div class="mt-6 grid gap-10 lg:grid-cols-[1fr_22rem]">
+  <div class="mt-6 grid gap-10 lg:grid-cols-[1fr_24rem]">
     <div>
-      <h1 class="text-3xl font-bold text-slate-900">{{ product.title }}</h1>
+      <div class="flex flex-wrap gap-1">{% product_badges product %}</div>
+      <h1 class="mt-2 text-3xl font-bold text-slate-900">{{ product.title }}</h1>
       <p class="mt-3 text-lg text-slate-600">{{ product.short_description }}</p>
-      {% if product.review_count %}<p class="mt-2 text-sm text-amber-600">★ {{ product.avg_rating|floatformat:1 }} · {{ product.review_count }} review{{ product.review_count|pluralize }}</p>{% endif %}
-      <div class="mt-4 flex flex-wrap gap-2">
+      <div class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+        {% if product.review_count %}<span class="text-amber-600">★ {{ product.avg_rating|floatformat:1 }} · {{ product.review_count }} review{{ product.review_count|pluralize }}</span>{% endif %}
+        <span class="text-slate-500">{{ product.get_product_type_display }}</span>
         {% for fw in product.frameworks.all %}<span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">{{ fw.name }}</span>{% endfor %}
       </div>
 
-      {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.title }}" class="mt-8 w-full rounded-2xl border border-slate-200">{% endif %}
+      {# Gallery: cover + screenshots #}
+      {% with gallery=product.images.all %}
+      {% if product.image or gallery %}
+      <div class="mt-8" x-data="{ active: 0 }">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          {% if product.image %}<img x-show="active === 0" src="{{ product.image.url }}" alt="{{ product.title }}" class="aspect-[16/9] w-full object-contain">{% endif %}
+          {% for img in gallery %}<img x-cloak x-show="active === {{ forloop.counter }}" src="{{ img.image.url }}" alt="{{ img.alt|default:product.title }}" class="aspect-[16/9] w-full object-contain" loading="lazy">{% endfor %}
+        </div>
+        {% if gallery %}
+        <div class="mt-3 flex gap-2 overflow-x-auto">
+          {% if product.image %}<button type="button" @click="active = 0" :class="active === 0 ? 'ring-2 ring-brand-500' : ''" class="shrink-0 overflow-hidden rounded-lg border border-slate-200"><img src="{{ product.image.url }}" alt="" class="h-16 w-24 object-cover"></button>{% endif %}
+          {% for img in gallery %}<button type="button" @click="active = {{ forloop.counter }}" :class="active === {{ forloop.counter }} ? 'ring-2 ring-brand-500' : ''" class="shrink-0 overflow-hidden rounded-lg border border-slate-200"><img src="{{ img.image.url }}" alt="" class="h-16 w-24 object-cover" loading="lazy"></button>{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% endwith %}
 
       <div class="prose prose-slate mt-8 max-w-none">{{ product.description|linebreaks }}</div>
+
+      {% if product.is_bundle %}
+      <section class="mt-10">
+        <h2 class="text-xl font-semibold text-slate-900">Included in this bundle</h2>
+        <ul class="card mt-4 divide-y divide-slate-100">
+          {% for item in product.bundle_items.all %}
+          <li class="flex items-center justify-between p-4">
+            <a href="{{ item.get_absolute_url }}" class="font-medium text-slate-900 hover:text-brand-700">{{ item.title }}</a>
+            <span class="text-sm text-slate-500">${{ item.price }}</span>
+          </li>
+          {% endfor %}
+          {% if product.bundle_savings %}
+          <li class="flex items-center justify-between bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
+            <span>Bought separately: ${{ product.bundle_value }}</span><span>You save ${{ product.bundle_savings }}</span>
+          </li>
+          {% endif %}
+        </ul>
+      </section>
+      {% endif %}
 
       {% if product.included_items %}
       <h2 class="mt-10 text-xl font-semibold text-slate-900">What's included</h2>
@@ -26,15 +68,32 @@
       </ul>
       {% endif %}
 
+      {% if files %}
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">Files</h2>
+      <ul class="mt-4 space-y-1 text-sm text-slate-700">
+        {% for f in files %}{% with v=f.latest_version %}<li>{{ f.title }}{% if v %} <span class="text-slate-400">· v{{ v.version }} · {{ v.size|filesizeformat }}</span>{% endif %}</li>{% endwith %}{% endfor %}
+      </ul>
+      {% endif %}
+
+      {% if product.video_embed_url or product.sample_file %}
+      <section class="mt-10">
+        <h2 class="text-xl font-semibold text-slate-900">Preview</h2>
+        {% if product.video_embed_url %}
+        <div class="mt-4 aspect-video overflow-hidden rounded-2xl border border-slate-200">
+          <iframe src="{{ product.video_embed_url }}" title="{{ product.title }} preview" class="h-full w-full" allow="fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+        {% endif %}
+        {% if product.sample_file %}<a href="{{ product.sample_file.url }}" target="_blank" rel="noopener" class="btn-secondary mt-4">View free sample</a>{% endif %}
+      </section>
+      {% endif %}
+
       <section class="mt-14" x-data="{ open: false }">
         <div class="flex items-center justify-between">
           <h2 class="text-xl font-semibold text-slate-900">Reviews</h2>
-          {% if user.is_authenticated %}<button type="button" class="btn-secondary" @click="open = !open">Write a review</button>{% endif %}
+          {% if can_review %}<button type="button" class="btn-secondary" @click="open = !open">Write a review</button>{% endif %}
         </div>
-        {% if user.is_authenticated %}
-        <div x-cloak x-show="open" x-transition class="mt-4">
-          {% include "reviews/_form.html" %}
-        </div>
+        {% if can_review %}
+        <div x-cloak x-show="open" x-transition class="mt-4">{% include "reviews/_form.html" %}</div>
         {% endif %}
         <div class="mt-6 space-y-4">
           {% for r in reviews %}
@@ -42,32 +101,66 @@
             <p class="text-sm text-amber-600">{% for _ in "x"|rjust:r.rating %}★{% endfor %}</p>
             <p class="mt-1 font-semibold text-slate-900">{{ r.title }}</p>
             <p class="mt-1 text-sm text-slate-600">{{ r.body|linebreaksbr }}</p>
-            <p class="mt-2 text-xs text-slate-400">{{ r.user.first_name|default:"Customer" }}{% if r.is_verified_purchase %} · Verified purchase{% endif %} · {{ r.created_at|date:"M Y" }}</p>
+            <p class="mt-2 text-xs text-slate-400">{{ r.user.first_name|default:"Customer" }} · Verified buyer · {{ r.created_at|date:"M Y" }}</p>
           </div>
           {% empty %}
-          <p class="text-sm text-slate-500">No reviews yet.</p>
+          <p class="text-sm text-slate-500">No reviews yet. Reviews come from verified buyers only.</p>
           {% endfor %}
         </div>
       </section>
     </div>
 
     <aside>
-      <div class="card sticky top-24 p-6">
+      <div class="card sticky top-24 p-6"
+           x-data="{ tier: 'single', prices: { {% for tier, label, price, desc in license_options %}'{{ tier }}': '{{ price }}'{% if not forloop.last %}, {% endif %}{% endfor %} } }">
         <div class="flex items-baseline gap-2">
-          <span class="text-3xl font-bold text-slate-900">${{ product.price }}</span>
-          {% if product.compare_at_price %}<span class="text-slate-400 line-through">${{ product.compare_at_price }}</span>{% endif %}
+          <span class="text-3xl font-bold text-slate-900">$<span x-text="prices[tier]">{{ product.price }}</span></span>
+          {% if product.compare_at_price %}<span x-show="tier === 'single'" class="text-slate-400 line-through">${{ product.compare_at_price }}</span>{% endif %}
         </div>
-        <p class="mt-1 text-sm text-slate-500">One-time payment · Instant download</p>
-        <form method="post" action="{% url 'payments:create' product.slug %}" class="mt-6" x-data="{ loading: false }" @submit="loading = true">
+        <p class="mt-1 text-sm text-slate-500">One-time payment · Instant download · Free updates</p>
+
+        <form method="post" action="{% url 'payments:create' product.slug %}" class="mt-6 space-y-4" x-data="{ loading: false }" @submit="loading = true">
           {% csrf_token %}
+          {% if license_options|length > 1 %}
+          <fieldset class="space-y-2">
+            <legend class="mb-1 text-sm font-medium text-slate-700">License</legend>
+            {% for tier, label, price, desc in license_options %}
+            <label class="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 p-3 font-normal has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+              <span class="flex items-center gap-3">
+                <input type="radio" name="license" value="{{ tier }}" x-model="tier" {% if forloop.first %}checked{% endif %}>
+                <span><span class="block text-sm font-semibold text-slate-900">{{ label }}</span><span class="block text-xs text-slate-500">{{ desc }}</span></span>
+              </span>
+              <span class="text-sm font-semibold">${{ price }}</span>
+            </label>
+            {% endfor %}
+          </fieldset>
+          {% else %}
+          <input type="hidden" name="license" value="single">
+          {% endif %}
           <button class="btn-primary w-full" :disabled="loading">
             <span x-show="!loading">Buy now</span>
             <span x-cloak x-show="loading">Redirecting to checkout…</span>
           </button>
         </form>
-        <p class="mt-4 text-center text-xs text-slate-500">Secure payment via Stripe</p>
+        {% if product.system_requirements %}<p class="mt-4 text-xs text-slate-500"><span class="font-medium">Requires:</span> {{ product.system_requirements }}</p>{% endif %}
+        <p class="mt-2 text-xs text-slate-500">Secure payment via Stripe · <a href="/license/" class="underline">License terms</a></p>
       </div>
+
+      {% for bundle in bundles_including %}
+      <a href="{{ bundle.get_absolute_url }}" class="card mt-4 block p-5 hover:border-brand-300">
+        <p class="text-xs font-semibold uppercase text-brand-600">Better value</p>
+        <p class="mt-1 font-semibold text-slate-900">Get it in {{ bundle.title }}</p>
+        <p class="text-sm text-slate-600">${{ bundle.price }}{% if bundle.bundle_savings %} · save ${{ bundle.bundle_savings }}{% endif %}</p>
+      </a>
+      {% endfor %}
     </aside>
   </div>
+
+  {% if related %}
+  <section class="mt-20">
+    <h2 class="text-xl font-semibold text-slate-900">Related kits</h2>
+    <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{% for product in related %}{% include "catalog/_product_card.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
 </div>
 {% endblock %}

@@ -10,7 +10,7 @@ def home(request):
     orders = Order.objects.filter(user=request.user).exclude(status=Order.Status.PENDING).prefetch_related("items")
     entitlements = (
         Entitlement.objects.filter(order_item__order__user=request.user, order_item__order__status=Order.Status.PAID)
-        .select_related("order_item__product")
+        .select_related("product", "order_item__order")
         .order_by("-created_at")
     )
     return render(request, "dashboard/home.html", {"orders": orders[:20], "entitlements": entitlements})

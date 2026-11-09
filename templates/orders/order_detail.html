@@ -9,8 +9,8 @@
     {% for item in order.items.all %}
     <div class="flex items-center justify-between p-4">
       <div>
-        <p class="font-medium text-slate-900">{{ item.product_title }}</p>
-        {% for ent in item.entitlements.all %}<a href="{{ ent.get_absolute_url }}" class="text-sm text-brand-600 hover:underline">Download files</a>{% endfor %}
+        <p class="font-medium text-slate-900">{{ item.product_title }} <span class="text-sm font-normal text-slate-500">· {{ item.license_label }} license</span></p>
+        {% if order.status == "paid" %}{% for ent in item.entitlements.all %}<a href="{{ ent.get_absolute_url }}" class="block text-sm text-brand-600 hover:underline">Download {{ ent.product.title }}</a>{% endfor %}{% endif %}
       </div>
       <p class="font-medium">${{ item.line_total }}</p>
     </div>

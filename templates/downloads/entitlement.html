@@ -3,24 +3,26 @@
 {% block extra_head %}<meta name="robots" content="noindex, nofollow">{% endblock %}
 {% block content %}
 <div class="container-page max-w-3xl py-12">
-  <h1 class="text-2xl font-bold text-slate-900">{{ entitlement.product.title }}</h1>
-  <p class="mt-1 text-sm text-slate-500">
-    {{ entitlement.download_count }} of {{ entitlement.max_downloads }} downloads used
-    {% if entitlement.expires_at %}· access until {{ entitlement.expires_at|date:"M j, Y" }}{% endif %}
-  </p>
-  {% if not entitlement.is_usable %}
-    <p class="mt-6 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">This link has expired or reached its download limit. Contact us and we'll help.</p>
-  {% else %}
+  <p class="text-sm text-slate-500">Order {{ entitlement.order.short_number }} · {{ entitlement.order_item.license_label }} license</p>
+  <h1 class="mt-1 text-2xl font-bold text-slate-900">{{ entitlement.product.title }}</h1>
+  <p class="mt-2 text-sm text-slate-500">Each file can be downloaded {{ entitlement.max_downloads }} times. This page's links expire after a while for security; you can always get fresh ones from your account.</p>
   <ul class="card mt-6 divide-y divide-slate-100">
-    {% for f in files %}
-    <li class="flex items-center justify-between p-4">
-      <div><p class="font-medium text-slate-900">{{ f.title }}</p><p class="text-xs text-slate-500">Version {{ f.version }}</p></div>
-      <a href="{% url 'downloads:file' entitlement.token f.pk %}" class="btn-primary">Download</a>
+    {% for row in files %}
+    <li class="flex flex-wrap items-center justify-between gap-4 p-4">
+      <div>
+        <p class="font-medium text-slate-900">{{ row.file.title }}</p>
+        <p class="text-xs text-slate-500">Version {{ row.version.version }} · {{ row.version.size|filesizeformat }} · {{ row.used }}/{{ entitlement.max_downloads }} downloads used</p>
+        {% if row.version.changelog %}<details class="mt-1 text-xs text-slate-500"><summary class="cursor-pointer">What's new</summary><p class="mt-1 whitespace-pre-line">{{ row.version.changelog }}</p></details>{% endif %}
+      </div>
+      {% if row.used < entitlement.max_downloads %}
+        <a href="{% url 'downloads:file' signed row.file.pk %}" class="btn-primary">Download</a>
+      {% else %}
+        <span class="text-sm text-amber-700">Limit reached</span>
+      {% endif %}
     </li>
     {% empty %}
-    <li class="p-4 text-sm text-slate-500">Files are being prepared. Check back shortly.</li>
+    <li class="p-4 text-sm text-slate-500">Files are being prepared. We'll email you when they're ready.</li>
     {% endfor %}
   </ul>
-  {% endif %}
 </div>
 {% endblock %}

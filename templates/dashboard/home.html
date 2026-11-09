@@ -10,8 +10,8 @@
       {% for ent in entitlements %}
       <div class="card flex items-center justify-between p-5">
         <div>
-          <p class="font-medium text-slate-900">{{ ent.order_item.product.title }}</p>
-          <p class="text-xs text-slate-500">{{ ent.download_count }}/{{ ent.max_downloads }} downloads used</p>
+          <p class="font-medium text-slate-900">{{ ent.product.title }}</p>
+          <p class="text-xs text-slate-500">{{ ent.order_item.license_label }} license · order {{ ent.order.short_number }}</p>
         </div>
         <a href="{{ ent.get_absolute_url }}" class="btn-primary">Open</a>
       </div>

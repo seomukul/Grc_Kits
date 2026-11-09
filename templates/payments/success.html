@@ -9,7 +9,14 @@
   <div id="order-status" class="mt-3 text-slate-600"
        {% if order.status != "paid" %}hx-get="{{ request.get_full_path }}" hx-trigger="every 3s" hx-select="#order-status" hx-swap="outerHTML"{% endif %}>
     {% if order.status == "paid" %}
-      Order <strong>{{ order.short_number }}</strong> is confirmed. We've emailed your download links to <strong>{{ order.email }}</strong>.
+      Order <strong>{{ order.short_number }}</strong> is confirmed. We've also emailed your download links to <strong>{{ order.email }}</strong>.
+      <div class="mx-auto mt-6 max-w-md space-y-2 text-left">
+        {% for item in order.items.all %}{% for ent in item.entitlements.all %}
+        <a href="{{ ent.get_absolute_url }}" class="card flex items-center justify-between p-4 hover:border-brand-300">
+          <span class="font-medium text-slate-900">{{ ent.product.title }}</span><span class="btn-primary">Download</span>
+        </a>
+        {% endfor %}{% endfor %}
+      </div>
     {% else %}
       We're confirming your payment. This page updates automatically, and your download links will arrive by email.
     {% endif %}
