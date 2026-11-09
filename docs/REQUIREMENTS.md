@@ -15,7 +15,7 @@ Status key: ✅ done in Sprint 0 · 🟡 partial · ⬜ not started
 | Gumroad product URL field on every product | Removed |
 | Gumroad API/Ping sales import, Phase 1 → 2 data migration | Removed. All sales come from Stripe webhooks |
 | Payment-provider abstraction (Gumroad/Stripe switch) | Not needed. Payment logic stays isolated in `apps/payments` so another provider (e.g. Paddle/Lemon Squeezy for tax) could be added later |
-| Gumroad handles tax and file delivery | **We do.** Stripe Tax for VAT/GST/sales tax; our own secure download system. *Owner to confirm tax obligations with an accountant.* |
+| Gumroad handles tax and file delivery | **We do** file delivery with our own secure download system. Stripe Tax is not used (owner decision); tax obligations remain the owner's. |
 | "My Library" and Cart were Phase 2 / optional | Required at launch |
 | Sales by source "Gumroad / Stripe" | Source = Stripe / coupon / affiliate + traffic source (UTM) |
 
@@ -75,7 +75,7 @@ Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DS
 - ⬜ Receipt / invoice PDF with order number (Stripe Checkout `invoice_creation` can do this)
 - 🟡 Refund disables downloads ✅ (via `charge.refunded`) · admin "mark refunded" action ⬜ · disputes ⬜
 - ⬜ Apple Pay / Google Pay / Link (enable in Stripe Dashboard; Checkout shows them automatically)
-- ⬜ Stripe Tax
+- ~~Stripe Tax~~ (owner decision: not used)
 
 ### 4.4 Marketing
 - 🟡 Email list ✅ · welcome email ⬜ · export / Mailchimp-MailerLite-Brevo sync ⬜
@@ -118,16 +118,31 @@ Starting categories: ISO 27001 · ISO 42001 / AI Governance · Risk Management �
 
 | Sprint | Scope |
 |---|---|
-| **1 — Catalog & delivery core** | Product status (draft/published/hidden/scheduled), product types, gallery/preview, license tiers, multiple files + versions/changelog, bundles. Downloads: 24 h signed links, limit 5 (admin setting). Object storage (Cloudflare R2/S3) for 500 MB files. Storefront filters + sorting. |
-| **2 — Cart & Stripe launch-ready** | Cart (HTMX), coupons, multi-item Stripe Checkout, Stripe Tax, wallets, invoices/receipts, refunds + disputes, capture fees & country. Magic-link My Library. Confirmation page download buttons. Verified-buyer reviews. |
+| **1 — Catalog & delivery core** | Product status (draft/published/hidden/scheduled), product types, gallery/preview, license tiers, multiple files + versions/changelog, bundles. Downloads: 24 h signed links, limit 5 (admin setting). Cloudflare R2 private storage with direct uploads for 500 MB files. Storefront filters + sorting. |
+| **2 — Cart & Stripe launch-ready** | Cart (HTMX), coupons, multi-item Stripe Checkout, wallets, invoices/receipts, refunds + disputes, capture fees & country. Magic-link My Library. Confirmation page download buttons. Verified-buyer reviews. |
 | **3 — Site content** | Homepage CMS (slider, trust bar, sections toggle/order, top selling, new arrivals, testimonials, FAQ). Services migrated from cyberprolab.com with full detail layout. About, Contact, License Terms. |
 | **4 — Admin analytics** | Sales dashboard with period selector and charts, customers screen, CSV/Excel export, order actions (resend link/receipt), Site Settings, Editor role, 2FA. |
 | **5 — Blog & marketing, launch** | Blog categories/tags/rich text/scheduling/TOC/RSS. Welcome email, ESP sync, lead magnets. GA4/Search Console, backups, uptime, production deploy. |
 
-## 10. Open decisions for the owner
+## 10. Owner decisions (2026-11-09)
 
-1. **License tiers** (Single / Team / Organization price per product): at launch or later? This changes the product, cart and order models, so it's cheaper to decide before Sprint 1.
-2. **File storage:** Cloudflare R2 (recommended: cheap, no egress fees) or AWS S3? Needed for 500 MB files.
-3. **Coupons:** our own coupon rules (per-product, usage limits, shown in our reports) vs Stripe promotion codes only (simpler, less control).
-4. **Tax:** Stripe Tax on from day one? (Requires Stripe account details; confirm obligations with an accountant.)
-5. **Services content:** migrate automatically from cyberprolab.com/services, or will you supply text/images?
+| # | Topic | Decision |
+|---|---|---|
+| 1 | **License tiers** | Build tier support in Sprint 1. Every product has a **Single user** license (the base price). **Team** and **Organization** are optional per product. Defaults: Team = up to 10 users in one organisation, about 2× the base price. Organization = unlimited users in one legal entity, about 4×. No resale or redistribution on any tier. Admin can override each tier's price per product. Cart, order and receipt store the chosen tier; the License Terms page explains the tiers. |
+| 2 | **File storage** | **Cloudflare R2** for paid product files (private bucket). Downloads use presigned URLs valid for 24 h. Admin uploads go straight to R2, so 500 MB files never pass through Django. Implemented with `django-storages` (S3 API), so moving to VPS disk is just a settings change. Public images can live on R2 as well or on the VPS. |
+| 3 | **Coupons** | **Own coupon system**: percent or fixed amount, expiry, total and per-customer usage limits, per-product or sitewide, minimum order. The discount is applied before creating the Stripe session; codes and discounts are stored on the order for reports. Stripe promotion codes will be turned off. |
+| 4 | **Stripe Tax** | **Not used.** Prices are tax-inclusive USD. Tax obligations remain the owner's; revisit if needed. |
+| 5 | **Services content** | Migrated from cyberprolab.com and expanded by us (see below). The owner reviews before launch. |
+
+### Services to migrate (from cyberprolab.com/services and /training)
+
+The source site has short descriptions only and no detail pages. For each service we write an expanded page: overview, deliverables, process steps, who it's for, FAQ, and a CTA. These are drafts for the owner to review.
+
+1. **Information Security Management System (ISMS)**: ISO 27001 ISMS design and implementation
+2. **VAPT**: vulnerability assessment, penetration testing, phishing simulation, remediation guidance
+3. **IS Audit**: audit planning, risk-based auditing, controls assessment, compliance reporting
+4. **GRC**: regulatory compliance, governance frameworks, ongoing risk management
+5. **Risk Management**: risk identification, assessment and treatment, risk register, actionable insights
+6. **Cyber Security Training**: workshops, simulations and awareness programs. Certification tracks: CISA, CISM, CISSP, CEH, CompTIA Security+, ISO/IEC 27001 Lead Implementer, ISO/IEC 27001 Lead Auditor. Delivery: in-person, virtual or hybrid.
+
+Trust points to reuse: 10+ years of experience; CISSP-, CISA- and ISO 27001-certified experts; works with startups and enterprises.
