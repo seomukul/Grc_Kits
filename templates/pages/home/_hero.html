@@ -1,0 +1,33 @@
+<section class="relative overflow-hidden bg-brand-950 text-white"
+         x-data="{ i: 0, n: {{ items|length }}, timer: null,
+                   go(k) { this.i = (k + this.n) % this.n },
+                   start() { if (this.n > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.timer = setInterval(() => this.go(this.i + 1), 6000) },
+                   stop() { clearInterval(this.timer) } }"
+         x-init="start()" @mouseenter="stop()" @mouseleave="start()" @focusin="stop()"
+         aria-roledescription="carousel" aria-label="Highlights">
+  {% for slide in items %}
+  <div class="{% if not forloop.first %}hidden{% endif %} relative" :class="i === {{ forloop.counter0 }} ? '!block' : '!hidden'"
+       role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} of {{ items|length }}">
+    {% if slide.image %}
+      <img src="{{ slide.image.url }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-35" {% if not forloop.first %}loading="lazy"{% endif %}>
+    {% endif %}
+    <div class="absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/85 to-brand-900/40"></div>
+    <div class="container-page relative py-20 lg:py-28">
+      {% if slide.eyebrow %}<p class="text-sm font-semibold uppercase tracking-wider text-accent-500">{{ slide.eyebrow }}</p>{% endif %}
+      {% if forloop.first %}<h1 class="mt-3 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">{{ slide.headline }}</h1>{% else %}<p class="mt-3 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">{{ slide.headline }}</p>{% endif %}
+      {% if slide.subtext %}<p class="mt-6 max-w-2xl text-lg text-brand-100">{{ slide.subtext }}</p>{% endif %}
+      <div class="mt-8 flex flex-wrap gap-3">
+        {% if slide.button_label %}<a href="{{ slide.button_url }}" class="btn bg-white text-brand-900 hover:bg-brand-50">{{ slide.button_label }}</a>{% endif %}
+        {% if slide.secondary_label %}<a href="{{ slide.secondary_url }}" class="btn border border-white/30 text-white hover:bg-white/10">{{ slide.secondary_label }}</a>{% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% if items|length > 1 %}
+  <div class="absolute inset-x-0 bottom-6 flex items-center justify-center gap-2">
+    <button type="button" @click="go(i - 1)" class="rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white" aria-label="Previous slide">&#8249;</button>
+    {% for slide in items %}<button type="button" @click="go({{ forloop.counter0 }})" class="h-2 rounded-full transition-all" :class="i === {{ forloop.counter0 }} ? 'w-6 bg-white' : 'w-2 bg-white/40'" aria-label="Go to slide {{ forloop.counter }}"></button>{% endfor %}
+    <button type="button" @click="go(i + 1)" class="rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white" aria-label="Next slide">&#8250;</button>
+  </div>
+  {% endif %}
+</section>

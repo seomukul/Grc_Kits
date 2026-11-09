@@ -269,5 +269,19 @@ class ProductImage(models.Model):
         return self.alt or f"Image {self.pk}"
 
 
+class ProductFAQ(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="faqs")
+    question = models.CharField(max_length=200)
+    answer = models.TextField()
+    order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "FAQ"
+
+    def __str__(self):
+        return self.question
+
+
 def cents(amount: Decimal) -> int:
     return int((amount * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))

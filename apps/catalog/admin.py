@@ -7,7 +7,7 @@ from unfold.decorators import action, display
 from apps.core.models import SiteSettings
 from apps.downloads.models import ProductFile
 
-from .models import Category, Framework, Product, ProductImage, ProductLicense
+from .models import Category, Framework, Product, ProductFAQ, ProductImage, ProductLicense
 
 
 class ProductLicenseInline(TabularInline):
@@ -26,6 +26,12 @@ class ProductImageInline(TabularInline):
     model = ProductImage
     extra = 0
     fields = ("image", "alt", "order")
+
+
+class ProductFAQInline(TabularInline):
+    model = ProductFAQ
+    extra = 0
+    fields = ("question", "answer", "order")
 
 
 class ProductFileInline(TabularInline):
@@ -68,7 +74,7 @@ class ProductAdmin(ModelAdmin):
     search_fields = ("title", "short_description")
     prepopulated_fields = {"slug": ("title",)}
     filter_horizontal = ("frameworks", "bundle_items")
-    inlines = [ProductLicenseInline, ProductImageInline, ProductFileInline]
+    inlines = [ProductLicenseInline, ProductImageInline, ProductFileInline, ProductFAQInline]
     actions = ["publish", "unpublish", "duplicate"]
     fieldsets = (
         (None, {"fields": ("title", "slug", "category", "frameworks", "product_type")}),

@@ -87,6 +87,13 @@
       </section>
       {% endif %}
 
+      {% if faqs %}
+      <section class="mt-14">
+        <h2 class="text-xl font-semibold text-slate-900">FAQ</h2>
+        {% include "partials/_faq_list.html" %}
+      </section>
+      {% endif %}
+
       <section class="mt-14" x-data="{ open: false }">
         <div class="flex items-center justify-between">
           <h2 class="text-xl font-semibold text-slate-900">Reviews</h2>

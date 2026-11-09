@@ -1,0 +1,11 @@
+{% autoescape off %}Thanks for subscribing to {{ SITE_NAME }}!
+
+You'll get new GRC templates, toolkit updates and practical compliance tips. No spam, and you can unsubscribe any time.
+{% if lead_magnet_url %}
+Here's your free download{% if lead_magnet_title %} ({{ lead_magnet_title }}){% endif %}:
+{{ lead_magnet_url }}
+{% endif %}
+Browse all kits: {{ SITE_URL }}/kits/
+
+– The {{ SITE_NAME }} team
+{% endautoescape %}

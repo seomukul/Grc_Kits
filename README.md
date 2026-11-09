@@ -19,7 +19,8 @@ createdb grckits
 
 python manage.py migrate
 python manage.py createsuperuser
-python manage.py seed_demo      # optional demo catalog, pages and a service
+python manage.py seed_content   # starter content: 6 services, home slides, FAQs, legal drafts (safe in prod)
+python manage.py seed_demo      # optional demo catalog for local dev (also runs seed_content)
 
 python manage.py tailwind runserver   # Django dev server + Tailwind watcher together
 ```
@@ -110,6 +111,18 @@ With R2 enabled:
 
 Stripe webhook events to enable: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`, `charge.dispute.created`, `charge.dispute.closed`.
 
+## Site content (no code needed)
+
+All of it lives under **Admin → Content**:
+- **Home page sections:** 12 blocks (hero, trust bar, featured, top selling, new arrivals, browse, bundles, services, testimonials, blog, newsletter, FAQ). For each one you can turn it on or off, rename it, reorder it, or limit how many items it shows. Top selling has a choice of the last 30 days or all time. A section with nothing to show stays hidden.
+- **Hero slides, Trust bar, Testimonials, FAQs:** you can mark a FAQ "show on products"; products can also have their own FAQs.
+- **About page:** a single profile (photo, bio, certifications, experience timeline, stats).
+- **Services:** overview, deliverables, process steps, who it's for, per-service FAQs and CTA text.
+- **Leads (inquiries):** messages from service pages and the contact page, including attachments (private, staff-only download). Each lead is also emailed to *Site settings → Contact email*, with the customer as Reply-To.
+- **Site settings:** contact email, response-time note, social links, Calendly or Cal.com link, and the newsletter lead-magnet file.
+
+Spam protection on forms: a honeypot field, a minimum fill time, a signed form timestamp and a per-IP rate limit. There's no CAPTCHA.
+
 ## How purchase and delivery work
 
 1. **Checkout** (`POST /checkout/` from the cart) re-checks the cart and coupon, creates a `pending` Order and redirects to Stripe-hosted Checkout. Prices come from the database through `price_data`, so you don't have to create Stripe Price objects.
@@ -178,6 +191,15 @@ gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
 - [x] Magic-link sign-in to My Library, guest orders linked by email
 - [x] Admin: Refund in Stripe, Resend receipt, Coupons
 - [x] First-touch UTM/referrer attribution on orders
+
+## Sprint 3: done
+
+- [x] Admin-managed home page: 12 toggleable/reorderable sections, hero slider, trust bar, testimonials, FAQ
+- [x] 6 services migrated from cyberprolab.com and expanded (deliverables, process, audience, FAQs)
+- [x] Lead form with service dropdown, private attachments, owner email, spam protection
+- [x] About Me, Contact, License Terms and Refund Policy drafts
+- [x] Site settings: contact, socials, booking link, lead magnet; welcome email
+- [x] Product FAQs, footer social icons, header About/Contact links
 
 ## Next sprints (suggested)
 

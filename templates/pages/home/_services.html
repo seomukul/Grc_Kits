@@ -1,0 +1,7 @@
+<section class="container-page py-14">
+  {% url 'services:list' as svc %}
+  {% include "pages/home/_section_head.html" with link=svc link_label="All services" %}
+  <div class="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {% for s in items %}{% include "services/_card.html" %}{% endfor %}
+  </div>
+</section>

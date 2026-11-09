@@ -1,11 +1,6 @@
-<form hx-post="{% url 'services:inquire' service.slug %}" hx-swap="outerHTML" class="space-y-4">
+<form hx-post="{% url 'services:inquire' service.slug %}" hx-encoding="multipart/form-data" hx-swap="outerHTML"
+      method="post" action="{% url 'services:inquire' service.slug %}" enctype="multipart/form-data" class="space-y-4">
   {% csrf_token %}
-  {% for field in form %}
-  <div>
-    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-    {{ field }}
-    {{ field.errors }}
-  </div>
-  {% endfor %}
-  <button class="btn-primary w-full">Send inquiry <span class="htmx-indicator">…</span></button>
+  {% include "partials/_lead_form_fields.html" %}
+  <button class="btn-primary w-full">Send <span class="htmx-indicator">…</span></button>
 </form>

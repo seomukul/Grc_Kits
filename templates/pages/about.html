@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}About{% if profile %} {{ profile.name }}{% endif %} – {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{% if profile %}{{ profile.headline }}{% else %}About GRCkits{% endif %}{% endblock %}
+{% block content %}
+{% if profile %}
+<section class="bg-white">
+  <div class="container-page grid items-center gap-10 py-16 md:grid-cols-[16rem_1fr]">
+    {% if profile.photo %}<img src="{{ profile.photo.url }}" alt="{{ profile.name }}" class="aspect-square w-64 rounded-3xl object-cover">{% else %}<div class="grid aspect-square w-64 place-items-center rounded-3xl bg-brand-100 text-6xl font-bold text-brand-400">{{ profile.name|first }}</div>{% endif %}
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-wider text-brand-600">About me</p>
+      <h1 class="mt-2 text-4xl font-bold tracking-tight text-slate-900">{{ profile.name }}</h1>
+      <p class="mt-2 text-lg text-slate-600">{{ profile.headline }}</p>
+      {% if profile.certification_list %}
+      <ul class="mt-5 flex flex-wrap gap-2">{% for c in profile.certification_list %}<li class="rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-800">{{ c }}</li>{% endfor %}</ul>
+      {% endif %}
+      {% if profile.linkedin_url %}<a href="{{ profile.linkedin_url }}" target="_blank" rel="noopener" class="btn-secondary mt-6">Connect on LinkedIn</a>{% endif %}
+    </div>
+  </div>
+</section>
+{% if profile.stat_rows %}
+<section class="border-y border-slate-200 bg-brand-950 text-white">
+  <dl class="container-page grid grid-cols-2 gap-6 py-10 text-center md:grid-cols-4">
+    {% for value, label in profile.stat_rows %}<div><dt class="order-2 text-sm text-brand-200">{{ label }}</dt><dd class="text-3xl font-bold">{{ value }}</dd></div>{% endfor %}
+  </dl>
+</section>
+{% endif %}
+<div class="container-page grid gap-12 py-16 lg:grid-cols-[1fr_22rem]">
+  <article class="prose prose-slate max-w-none">{{ profile.bio|safe }}</article>
+  {% if profile.experience_rows %}
+  <aside>
+    <h2 class="text-lg font-semibold text-slate-900">Experience</h2>
+    <ol class="mt-4 space-y-4 border-l-2 border-brand-100 pl-5">
+      {% for years, role, org in profile.experience_rows %}
+      <li><p class="text-xs font-semibold text-brand-600">{{ years }}</p><p class="font-medium text-slate-900">{{ role }}</p>{% if org %}<p class="text-sm text-slate-500">{{ org }}</p>{% endif %}</li>
+      {% endfor %}
+    </ol>
+  </aside>
+  {% endif %}
+</div>
+{% else %}
+<div class="container-page py-24 text-center text-slate-500">The About page hasn't been set up yet (Admin → About page).</div>
+{% endif %}
+{% if services %}
+<section class="container-page pb-16">
+  <h2 class="text-2xl font-bold text-slate-900">How I can help</h2>
+  <div class="mt-6 grid gap-6 md:grid-cols-3">{% for s in services %}{% include "services/_card.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView
 
 from apps.core.models import SiteSettings
+from apps.pages.models import FAQItem
 from apps.downloads.models import Entitlement
 from apps.reviews.forms import ReviewForm
 
@@ -99,7 +100,7 @@ class ProductDetailView(DetailView):
         return (
             Product.objects.purchasable()
             .select_related("category")
-            .prefetch_related("frameworks", "images", "bundle_items", "licenses")
+            .prefetch_related("frameworks", "images", "bundle_items", "licenses", "faqs")
             .with_recent_sales()
             .annotate(
                 avg_rating=Avg("reviews__rating", filter=RATING_FILTER),
@@ -129,5 +130,6 @@ class ProductDetailView(DetailView):
             .select_related("category")
             .distinct()[:3],
             bundles_including=product.included_in_bundles.listed()[:2],
+            faqs=list(product.faqs.all()) + list(FAQItem.objects.filter(show_on_products=True)),
         )
         return ctx

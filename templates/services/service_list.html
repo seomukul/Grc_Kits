@@ -1,19 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Consulting services – {{ SITE_NAME }}{% endblock %}
+{% block title %}GRC, Audit & Cybersecurity Services – {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}ISMS / ISO 27001, VAPT, IS audit, GRC, risk management and cybersecurity training from certified practitioners.{% endblock %}
 {% block content %}
-<div class="container-page py-12">
-  <h1 class="text-3xl font-bold text-slate-900">Consulting services</h1>
-  <p class="mt-2 max-w-2xl text-slate-600">Templates get you most of the way. Our GRC specialists can take you the rest.</p>
-  <div class="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-    {% for s in services %}
-    <a href="{{ s.get_absolute_url }}" class="card block p-6 hover:border-brand-300">
-      <h2 class="font-semibold text-slate-900">{{ s.title }}</h2>
-      <p class="mt-2 text-sm text-slate-600">{{ s.summary }}</p>
-      {% if s.starting_price %}<p class="mt-4 text-sm font-medium text-brand-700">From ${{ s.starting_price|floatformat:0 }}</p>{% endif %}
-    </a>
-    {% empty %}
-    <p class="text-slate-500">Services coming soon.</p>
-    {% endfor %}
+<section class="bg-brand-950 text-white">
+  <div class="container-page py-16">
+    <p class="text-sm font-semibold uppercase tracking-wider text-accent-500">Services</p>
+    <h1 class="mt-2 max-w-3xl text-4xl font-bold tracking-tight">Cybersecurity, GRC and IT audit, delivered by certified practitioners</h1>
+    <p class="mt-4 max-w-2xl text-brand-100">Templates get you most of the way. When you need hands-on help with implementation, testing, audits or training, our CISSP-, CISA- and ISO 27001-certified team takes you the rest.</p>
+    <a href="{% url 'pages:contact' %}" class="btn mt-8 bg-white text-brand-900 hover:bg-brand-50">Book a consultation</a>
+  </div>
+</section>
+<div class="container-page py-14">
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {% for s in services %}{% include "services/_card.html" %}{% empty %}<p class="text-slate-500">Services coming soon.</p>{% endfor %}
   </div>
 </div>
 {% endblock %}

@@ -45,6 +45,21 @@ class SiteSettings(models.Model):
         help_text="Have Stripe create a PDF invoice for every order (Stripe charges a small invoicing fee).",
     )
 
+    # Contact & social
+    contact_email = models.EmailField(default="hello@grckits.com")
+    response_time_note = models.CharField(max_length=120, default="We reply within one business day.")
+    linkedin_url = models.URLField(blank=True)
+    facebook_url = models.URLField(blank=True)
+    x_url = models.URLField("X / Twitter URL", blank=True)
+    youtube_url = models.URLField(blank=True)
+    booking_url = models.URLField(
+        blank=True, help_text="Calendly or Cal.com link for discovery calls (shown on service and contact pages)."
+    )
+
+    # Newsletter lead magnet
+    lead_magnet_title = models.CharField(max_length=120, blank=True, help_text="e.g. Free ISO 27001 Policy Sample")
+    lead_magnet_file = models.FileField(upload_to="lead-magnets/", blank=True)
+
     class Meta:
         verbose_name = verbose_name_plural = "site settings"
 

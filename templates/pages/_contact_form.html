@@ -1,0 +1,6 @@
+<form hx-post="{% url 'pages:contact' %}" hx-encoding="multipart/form-data" hx-swap="outerHTML"
+      method="post" action="{% url 'pages:contact' %}" enctype="multipart/form-data" class="space-y-4">
+  {% csrf_token %}
+  {% include "partials/_lead_form_fields.html" %}
+  <button class="btn-primary w-full sm:w-auto">Send message <span class="htmx-indicator">…</span></button>
+</form>

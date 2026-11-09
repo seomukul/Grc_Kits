@@ -1,13 +1,13 @@
 from decimal import Decimal
 
 from django.core.files.base import ContentFile
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
 from apps.catalog.models import Category, Framework, LicenseTier, Product, ProductLicense
 from apps.core.models import SiteSettings
 from apps.downloads.models import ProductFile, ProductFileVersion
 from apps.pages.models import Page
-from apps.services.models import Service
 
 FRAMEWORKS = [
     ("ISO 27001", "iso-27001"),
@@ -67,14 +67,6 @@ class Command(BaseCommand):
         for tier in (LicenseTier.TEAM, LicenseTier.ORGANIZATION):
             ProductLicense.objects.get_or_create(product=bundle, tier=tier)
 
-        Service.objects.get_or_create(
-            slug="gap-assessment",
-            defaults={
-                "title": "ISO 27001 Gap Assessment",
-                "summary": "Find out exactly what stands between you and certification.",
-                "starting_price": Decimal("1500"),
-            },
-        )
         for title, slug in [
             ("About", "about"),
             ("Terms of Service", "terms"),
@@ -86,6 +78,7 @@ class Command(BaseCommand):
                 slug=slug,
                 defaults={"title": title, "body": f"<p>{title} content goes here.</p>", "show_in_footer": True},
             )
+        call_command("seed_content")
         self.stdout.write(self.style.SUCCESS("Demo data ready."))
 
     def _product(self, title, category, ptype, price, featured):

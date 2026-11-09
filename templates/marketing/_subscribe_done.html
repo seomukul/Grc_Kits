@@ -1,1 +1,4 @@
-<p class="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-800">Thanks! You're subscribed.</p>
+<div class="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+  <p>Thanks! You're subscribed.</p>
+  {% if lead_magnet_url %}<a href="{{ lead_magnet_url }}" class="mt-2 inline-block font-semibold underline">Download {{ lead_magnet_title|default:"your free sample" }}</a>{% endif %}
+</div>

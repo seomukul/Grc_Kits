@@ -1,0 +1,7 @@
+<section class="border-b border-slate-200 bg-white">
+  <ul class="container-page grid grid-cols-2 gap-4 py-5 text-sm font-medium text-slate-700 md:grid-cols-4">
+    {% for t in items %}
+    <li class="flex items-center gap-2"><span class="text-accent-600">{% include "partials/_icon.html" with name=t.icon cls="size-5" %}</span>{{ t.text }}</li>
+    {% endfor %}
+  </ul>
+</section>

@@ -25,21 +25,23 @@ Status key: ✅ done in Sprint 0 · 🟡 partial · ⬜ not started
 
 | Page | Status |
 |---|---|
-| Home | 🟡 basic sections; needs slider, sections CMS (§3) |
+| Home | ✅ 12 admin-managed sections (§3) |
 | Products → Category → Product detail | 🟡 |
 | Bundles | ✅ (bundle products) |
-| Services → service detail | 🟡 model + inquiry form; content from cyberprolab.com/services not migrated |
+| Services → service detail | ✅ 6 services migrated + expanded, full detail layout |
 | Blog → Category → Post | 🟡 posts only, no blog categories |
-| About Me | 🟡 generic CMS page; needs bio/certs/photo layout |
-| Contact Us | ⬜ form with spam protection |
+| About Me | ✅ layout + admin profile (owner fills bio, photo, certs) |
+| Contact Us | ✅ lead form, spam protection, attachment, booking link |
 | My Library | ✅ magic-link sign-in, files + orders + invoices |
 | Cart / Checkout | ✅ session cart, coupons, multi-item Stripe Checkout |
-| Legal: Privacy, Terms, Refund, License Terms | 🟡 CMS pages exist (seeded), License Terms missing |
+| Legal: Privacy, Terms, Refund, License Terms | 🟡 License Terms + Refund drafted (need legal review); Privacy & Terms still placeholders |
 | Admin: Dashboard, Products, Orders, Customers, Coupons, Blog, Services, Settings | 🟡 Unfold CRUD only; no analytics, customers, coupons, settings |
 
 ## 3. Home page (sections toggleable + reorderable from admin)
 
-⬜ Hero slider (3–5 slides: image, headline, sub-text, button) · ⬜ Trust bar · ✅ Featured products (manual) · ⬜ Top selling (auto, 30-day / all-time) · ⬜ New arrivals (auto) · 🟡 Browse by category/framework tiles · ⬜ Bundles / best value · ✅ Services preview · ⬜ Testimonials · ✅ Latest 3 blog posts · 🟡 Newsletter (no lead magnet yet) · ⬜ FAQ · 🟡 Footer (no social icons)
+✅ Hero slider (auto-rotating, pauses on hover, reduced-motion aware) · ✅ Trust bar · ✅ Featured products (manual) · ✅ Top selling (auto, 30-day / all-time) · ✅ New arrivals (auto) · ✅ Browse by category/framework tiles · ✅ Bundles / best value · ✅ Services preview · ✅ Testimonials (admin-entered) · ✅ Latest 3 blog posts · ✅ Newsletter + lead magnet + welcome email · ✅ FAQ · ✅ Footer (social icons, contact email)
+
+Every section can be switched on/off, retitled, reordered and limited in **Admin → Home page sections**. Empty sections hide themselves.
 
 Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DSS, Network Security.
 
@@ -61,7 +63,7 @@ Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DS
 ### 4.2 Storefront
 - ✅ Filters: category, framework, type, price range, rating · ✅ sorting (newest, popular, price, rating)
 - 🟡 Search (HTMX) · ⬜ suggestions/autocomplete
-- 🟡 Detail page: price, buy, description, included, reviews, gallery, preview, related products ✅ · FAQ ⬜
+- ✅ Detail page: price, buy, description, included, reviews, gallery, preview, related products, FAQ (per product + shared)
 - ✅ Reviews: moderation · **verified buyers only**
 - ✅ Bundles (discounted packs, framework "Complete Toolkit")
 - ✅ Coupons: own Coupon model (percent/fixed, expiry, total + per-customer limits, minimum order, per-product or sitewide)
@@ -78,8 +80,8 @@ Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DS
 - ~~Stripe Tax~~ (owner decision: not used)
 
 ### 4.4 Marketing
-- 🟡 Email list ✅ · welcome email ⬜ · export / Mailchimp-MailerLite-Brevo sync ⬜
-- ⬜ Free lead magnet per category (sample template for email)
+- 🟡 Email list ✅ · welcome email ✅ · export / Mailchimp-MailerLite-Brevo sync ⬜
+- 🟡 Free lead magnet (one sitewide file in Site settings; per-category later)
 - ⬜ Abandoned cart email · ✅ "customers also bought" on cart page
 - 🟡 Open Graph tags ✅ · share buttons ⬜
 - ⬜ Affiliate program (later)
@@ -101,10 +103,10 @@ Starting categories: ISO 27001 · ISO 42001 / AI Governance · Risk Management �
 
 ## 7. Services
 
-- ⬜ Replicate every service from https://cyberprolab.com/services/ (owner's own site): same headings, descriptions, structure
-- 🟡 Detail page: overview ✅ · deliverables, process steps, who it's for, FAQ ⬜
-- 🟡 Enquiry form → emailed + saved as lead ✅ · service dropdown, optional file upload ⬜
-- ⬜ Calendly / Cal.com embed (optional) · ✅ add/edit/reorder in admin
+- ✅ Replicate every service from https://cyberprolab.com/services/ (owner's own site): same headings, descriptions, structure
+- ✅ Detail page: overview, deliverables, process steps, who it's for, FAQ
+- ✅ Enquiry form → emailed (Reply-To customer) + saved as lead · service dropdown · optional file upload (private storage)
+- ✅ Calendly / Cal.com booking link (Site settings) · ✅ add/edit/reorder in admin
 
 ## 8. Other
 

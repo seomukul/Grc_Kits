@@ -1,0 +1,9 @@
+<section class="container-page py-14">
+  <div class="grid items-center gap-8 rounded-3xl bg-brand-900 px-8 py-12 text-white md:grid-cols-2 md:px-12">
+    <div>
+      <h2 class="text-2xl font-bold">{{ section.title|default:"Get free GRC templates & tips" }}</h2>
+      <p class="mt-2 text-brand-100">{% if section.subtitle %}{{ section.subtitle }}{% elif site_settings.lead_magnet_title %}Subscribe and get <strong>{{ site_settings.lead_magnet_title }}</strong> free, plus new toolkits and practical compliance tips.{% else %}New toolkits, updates and practical compliance tips. No spam.{% endif %}</p>
+    </div>
+    <div class="[&_label]:text-brand-100">{% include "marketing/_subscribe_form.html" with source="home" %}</div>
+  </div>
+</section>

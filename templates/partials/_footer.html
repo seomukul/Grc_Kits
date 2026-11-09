@@ -13,13 +13,23 @@
         <li><a href="{% url 'catalog:list' %}" class="hover:text-brand-600">All kits</a></li>
         <li><a href="{% url 'services:list' %}" class="hover:text-brand-600">Consulting services</a></li>
         <li><a href="{% url 'blog:list' %}" class="hover:text-brand-600">Blog</a></li>
+        <li><a href="{% url 'pages:about' %}" class="hover:text-brand-600">About</a></li>
+        <li><a href="{% url 'pages:contact' %}" class="hover:text-brand-600">Contact</a></li>
+        <li><a href="{% url 'account:login' %}" class="hover:text-brand-600">My Library</a></li>
       </ul>
     </div>
     <div>
-      <p class="text-sm font-semibold text-slate-900">Company</p>
+      <p class="text-sm font-semibold text-slate-900">Legal</p>
       <ul class="mt-3 space-y-2 text-sm text-slate-600">
         {% for p in footer_pages %}<li><a href="{{ p.get_absolute_url }}" class="hover:text-brand-600">{{ p.title }}</a></li>{% endfor %}
       </ul>
+      <a href="mailto:{{ site_settings.contact_email }}" class="mt-4 block text-sm text-slate-600 hover:text-brand-600">{{ site_settings.contact_email }}</a>
+      <div class="mt-3 flex gap-3 text-slate-500">
+        {% if site_settings.linkedin_url %}<a href="{{ site_settings.linkedin_url }}" target="_blank" rel="noopener" aria-label="LinkedIn" class="hover:text-brand-600"><svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg></a>{% endif %}
+        {% if site_settings.facebook_url %}<a href="{{ site_settings.facebook_url }}" target="_blank" rel="noopener" aria-label="Facebook" class="hover:text-brand-600"><svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07Z"/></svg></a>{% endif %}
+        {% if site_settings.x_url %}<a href="{{ site_settings.x_url }}" target="_blank" rel="noopener" aria-label="X" class="hover:text-brand-600"><svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.6l5.24 6.93 6.06-6.93Zm-1.29 19.5h2.04L6.48 3.24H4.3l13.31 17.41Z"/></svg></a>{% endif %}
+        {% if site_settings.youtube_url %}<a href="{{ site_settings.youtube_url }}" target="_blank" rel="noopener" aria-label="YouTube" class="hover:text-brand-600"><svg class="size-5" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg></a>{% endif %}
+      </div>
     </div>
   </div>
   <div class="border-t border-slate-100 py-6 text-center text-xs text-slate-500">&copy; {% now "Y" %} GRCkits. All rights reserved.</div>

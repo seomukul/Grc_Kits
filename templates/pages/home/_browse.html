@@ -1,0 +1,18 @@
+<section class="bg-white py-14">
+  <div class="container-page">
+    {% include "pages/home/_section_head.html" %}
+    <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      {% for fw in items.frameworks %}
+      <a href="{% url 'catalog:list' %}?framework={{ fw.slug }}" class="group rounded-xl border border-slate-200 p-5 hover:border-brand-400 hover:bg-brand-50">
+        <span class="block font-semibold text-slate-900 group-hover:text-brand-700">{{ fw.name }}</span>
+        <span class="text-xs text-slate-500">{{ fw.n }} kit{{ fw.n|pluralize }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% if items.categories %}
+    <div class="mt-6 flex flex-wrap gap-2">
+      {% for c in items.categories %}<a href="{{ c.get_absolute_url }}" class="rounded-full border border-slate-200 px-4 py-1.5 text-sm hover:border-brand-400">{{ c.name }}</a>{% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>

@@ -38,6 +38,8 @@ class SiteSettingsAdmin(ModelAdmin):
         ("License tiers", {"fields": ("team_price_multiplier", "organization_price_multiplier", "team_max_users")}),
         ("Storefront badges", {"fields": ("new_badge_days", "bestseller_min_sales")}),
         ("Checkout", {"fields": ("stripe_invoices",)}),
+        ("Contact & social", {"fields": ("contact_email", "response_time_note", "booking_url", "linkedin_url", "facebook_url", "x_url", "youtube_url")}),
+        ("Newsletter lead magnet", {"fields": ("lead_magnet_title", "lead_magnet_file")}),
     )
 
     def has_add_permission(self, request):

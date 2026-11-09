@@ -9,6 +9,8 @@
       <a href="{% url 'catalog:list' %}" class="hover:text-brand-600">Kits & Templates</a>
       <a href="{% url 'services:list' %}" class="hover:text-brand-600">Services</a>
       <a href="{% url 'blog:list' %}" class="hover:text-brand-600">Blog</a>
+      <a href="{% url 'pages:about' %}" class="hover:text-brand-600">About</a>
+      <a href="{% url 'pages:contact' %}" class="hover:text-brand-600">Contact</a>
     </div>
 
     <div class="hidden items-center gap-3 md:flex">
@@ -43,6 +45,8 @@
       <a href="{% url 'catalog:list' %}" class="rounded px-2 py-2 hover:bg-slate-100">Kits & Templates</a>
       <a href="{% url 'services:list' %}" class="rounded px-2 py-2 hover:bg-slate-100">Services</a>
       <a href="{% url 'blog:list' %}" class="rounded px-2 py-2 hover:bg-slate-100">Blog</a>
+      <a href="{% url 'pages:about' %}" class="rounded px-2 py-2 hover:bg-slate-100">About</a>
+      <a href="{% url 'pages:contact' %}" class="rounded px-2 py-2 hover:bg-slate-100">Contact</a>
       {% if user.is_authenticated %}
         <a href="{% url 'dashboard:home' %}" class="rounded px-2 py-2 hover:bg-slate-100">My Library</a>
       {% else %}

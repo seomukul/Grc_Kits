@@ -1,0 +1,7 @@
+<section class="container-page py-14">
+  {% url 'catalog:list' as shop %}
+  {% include "pages/home/_section_head.html" with link=shop|add:"?sort=popular" %}
+  <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {% for product in items %}{% include "catalog/_product_card.html" %}{% endfor %}
+  </div>
+</section>
