@@ -33,6 +33,7 @@ class HomeSection(models.Model):
 
     class Key(models.TextChoices):
         HERO = "hero", "Hero slider"
+        MARQUEE = "marquee", "Framework ticker"
         TRUST = "trust", "Trust bar"
         FEATURED = "featured", "Featured products"
         TOP_SELLING = "top_selling", "Top selling products"
@@ -44,6 +45,11 @@ class HomeSection(models.Model):
         BLOG = "blog", "Latest from the blog"
         NEWSLETTER = "newsletter", "Newsletter signup"
         FAQ = "faq", "FAQ"
+        COMPARE = "compare", "Toolkit vs consultant"
+        STEPS = "steps", "How it works (steps)"
+        INSIDE = "inside", "Inside every toolkit"
+        AUTHOR = "author", "Written by practitioners"
+        CTA = "cta", "Closing call to action"
 
     class Period(models.TextChoices):
         LAST_30 = "30d", "Last 30 days"
@@ -58,6 +64,16 @@ class HomeSection(models.Model):
     period = models.CharField(
         max_length=3, choices=Period.choices, default=Period.LAST_30, help_text="Top selling only."
     )
+    eyebrow = models.CharField(max_length=60, blank=True, help_text="Small gold label above the heading.")
+    content = models.TextField(
+        blank=True,
+        help_text=(
+            "Text blocks for Steps / Inside / Compare: one per line as 'Title | text'. "
+            "Compare: prefix lines with 'consultant:' or 'toolkit:'."
+        ),
+    )
+    button_label = models.CharField(max_length=40, blank=True)
+    button_url = models.CharField(max_length=300, blank=True)
 
     class Meta:
         ordering = ["order"]
@@ -70,11 +86,20 @@ class HomeSection(models.Model):
     def heading(self):
         return self.title or self.get_key_display()
 
+    @property
+    def blocks(self):
+        """[(title, text), ...] parsed from `content`."""
+        return [[p.strip() for p in (line.split("|", 1) + [""])[:2]] for line in lines(self.content)]
+
+    def compare_rows(self, side):
+        prefix = f"{side}:"
+        return [line[len(prefix):].strip() for line in lines(self.content) if line.lower().startswith(prefix)]
+
 
 class HeroSlide(models.Model):
     image = models.ImageField(upload_to="home/slides/", blank=True, help_text="Wide image, about 1600×700.")
     eyebrow = models.CharField(max_length=80, blank=True, help_text="Small text above the headline.")
-    headline = models.CharField(max_length=120)
+    headline = models.CharField(max_length=120, help_text="Wrap words in *stars* to show them in gold.")
     subtext = models.CharField(max_length=250, blank=True)
     button_label = models.CharField(max_length=40, blank=True)
     button_url = models.CharField(max_length=300, blank=True, help_text="e.g. /kits/iso-27001-complete-toolkit/")

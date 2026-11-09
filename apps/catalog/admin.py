@@ -58,7 +58,7 @@ class FrameworkAdmin(ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
-    list_display = ("name", "slug", "order")
+    list_display = ("name", "slug", "icon", "order")
     list_editable = ("order",)
     prepopulated_fields = {"slug": ("name",)}
 
@@ -80,7 +80,7 @@ class ProductAdmin(ModelAdmin):
         (None, {"fields": ("title", "slug", "category", "frameworks", "product_type")}),
         ("Status", {"fields": ("status", "publish_at", "is_featured")}),
         ("Content", {"fields": ("short_description", "description", "whats_included", "system_requirements")}),
-        ("Media & preview", {"fields": ("image", "preview_video_url", "sample_file")}),
+        ("Media & preview", {"fields": ("cover_label", "image", "preview_video_url", "sample_file")}),
         ("Pricing", {"fields": ("price", "compare_at_price", "currency")}),
         (
             "Bundle",

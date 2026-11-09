@@ -19,7 +19,10 @@ class HomeSectionAdmin(ModelAdmin):
     list_editable = ("title", "is_enabled", "order", "item_limit", "period")
     list_display_links = ("__str__",)
     readonly_fields = ("key",)
-    fields = ("key", "title", "subtitle", "is_enabled", "order", "item_limit", "period")
+    fields = (
+        "key", "eyebrow", "title", "subtitle", "is_enabled", "order", "item_limit", "period",
+        "content", "button_label", "button_url",
+    )
 
     def has_add_permission(self, request):
         return False

@@ -1,17 +1,20 @@
-<section class="bg-white py-14">
+<section class="bg-slate-100/70 py-20">
   <div class="container-page">
     {% include "pages/home/_section_head.html" %}
-    <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-      {% for fw in items.frameworks %}
-      <a href="{% url 'catalog:list' %}?framework={{ fw.slug }}" class="group rounded-xl border border-slate-200 p-5 hover:border-brand-400 hover:bg-brand-50">
-        <span class="block font-semibold text-slate-900 group-hover:text-brand-700">{{ fw.name }}</span>
-        <span class="text-xs text-slate-500">{{ fw.n }} kit{{ fw.n|pluralize }}</span>
+    <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {% for c in items.categories %}
+      <a href="{{ c.get_absolute_url }}" class="card card-hover group flex flex-col border-t-2 border-t-brand-500 p-6">
+        <span class="text-brand-600">{% include "partials/_icon.html" with name=c.icon cls="size-7" %}</span>
+        <h3 class="mt-4 text-xl text-slate-900">{{ c.name }}</h3>
+        <p class="mt-2 flex-1 text-sm text-slate-600">{{ c.description|default:"" }}</p>
+        <p class="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-600 group-hover:text-brand-700">View {{ c.n }} toolkit{{ c.n|pluralize }} &rarr;</p>
       </a>
       {% endfor %}
     </div>
-    {% if items.categories %}
-    <div class="mt-6 flex flex-wrap gap-2">
-      {% for c in items.categories %}<a href="{{ c.get_absolute_url }}" class="rounded-full border border-slate-200 px-4 py-1.5 text-sm hover:border-brand-400">{{ c.name }}</a>{% endfor %}
+    {% if items.frameworks %}
+    <div class="mt-8 flex flex-wrap items-center gap-2">
+      <span class="mr-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Popular:</span>
+      {% for fw in items.frameworks %}<a href="{% url 'catalog:list' %}?framework={{ fw.slug }}" class="rounded-sm border border-slate-300 bg-paper px-3 py-1 text-sm hover:border-brand-500 hover:text-brand-700">{{ fw.name }}</a>{% endfor %}
     </div>
     {% endif %}
   </div>

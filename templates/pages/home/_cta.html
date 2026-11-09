@@ -1,0 +1,8 @@
+<section class="relative overflow-hidden bg-brand-950 py-24 text-center">
+  <div class="absolute inset-0 opacity-[0.05]" style="background-image: radial-gradient(var(--color-brand-300) 1px, transparent 1px); background-size: 18px 18px;"></div>
+  <div class="container-page relative max-w-3xl">
+    <h2 class="text-4xl text-slate-50 sm:text-5xl">{{ section.heading }}</h2>
+    {% if section.subtitle %}<p class="mt-5 text-lg text-slate-300">{{ section.subtitle }}</p>{% endif %}
+    {% if section.button_label %}<a href="{{ section.button_url }}" class="btn-primary mt-10 !px-8 !py-3.5">{{ section.button_label }}</a>{% endif %}
+  </div>
+</section>

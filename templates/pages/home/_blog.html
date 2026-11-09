@@ -1,13 +1,13 @@
-<section class="container-page py-14">
+<section class="container-page py-20">
   {% url 'blog:list' as blog %}
   {% include "pages/home/_section_head.html" with link=blog %}
-  <div class="mt-6 grid gap-6 md:grid-cols-3">
+  <div class="mt-10 grid gap-6 md:grid-cols-3">
     {% for post in items %}
-    <a href="{{ post.get_absolute_url }}" class="card block overflow-hidden hover:border-brand-300">
+    <a href="{{ post.get_absolute_url }}" class="card card-hover block overflow-hidden">
       {% if post.cover_image %}<img src="{{ post.cover_image.url }}" alt="" class="aspect-[16/9] w-full object-cover" loading="lazy">{% endif %}
       <div class="p-6">
         <p class="text-xs text-slate-500">{{ post.published_at|date:"M j, Y" }}</p>
-        <h3 class="mt-1 font-semibold text-slate-900">{{ post.title }}</h3>
+        <h3 class="mt-1 text-lg text-slate-900">{{ post.title }}</h3>
         <p class="mt-2 line-clamp-3 text-sm text-slate-600">{{ post.excerpt }}</p>
       </div>
     </a>

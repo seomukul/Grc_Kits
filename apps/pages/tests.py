@@ -49,19 +49,21 @@ class ContentTests(TestCase):
         call_command("seed_content", verbosity=0)
         self.assertEqual(before, (Service.objects.count(), HeroSlide.objects.count(), FAQItem.objects.count()))
         self.assertEqual(Service.objects.count(), 6)
-        self.assertEqual(HomeSection.objects.count(), 12)
+        self.assertEqual(HomeSection.objects.count(), 18)
 
     def test_home_renders_sections_in_order_and_respects_toggle(self):
         html = self.client.get("/").content.decode()
-        self.assertIn("Audit-ready GRC templates", html)
+        self.assertIn("written by a working auditor", html)
         self.assertIn("Featured Kit", html)
-        self.assertLess(html.index("Instant download"), html.index("Featured toolkits"))
+        self.assertLess(html.index("written by a working auditor"), html.index("Featured toolkits"))
+        self.assertIn("The toolkit vs. the consultant", html)
+        self.assertIn("Inside every toolkit", html)
         HomeSection.objects.filter(key="featured").update(is_enabled=False)
         self.assertNotIn("Featured toolkits", self.client.get("/").content.decode())
         HomeSection.objects.filter(key="faq").update(order=0)
-        HomeSection.objects.filter(key="hero").update(order=99)
+        HomeSection.objects.filter(key="hero").update(order=999)
         html = self.client.get("/").content.decode()
-        self.assertLess(html.index("Frequently asked questions"), html.index("Audit-ready GRC templates"))
+        self.assertLess(html.index("Frequently asked questions"), html.index("written by a working auditor"))
 
     def test_empty_sections_are_hidden(self):
         # No testimonials or sales yet: those headings must not render.

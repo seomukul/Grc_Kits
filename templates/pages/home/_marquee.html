@@ -1,0 +1,7 @@
+<section class="overflow-hidden border-y border-white/10 bg-brand-950 py-3" aria-label="Frameworks covered">
+  <div class="flex w-max animate-marquee gap-10 whitespace-nowrap text-xs font-semibold uppercase tracking-[0.25em] text-slate-400 hover:[animation-play-state:paused]">
+    {% for copy in "12" %}
+      {% for fw in items %}<a href="{% url 'catalog:list' %}?framework={{ fw.slug }}" class="flex items-center gap-10 hover:text-brand-300" {% if forloop.parentloop.counter == 2 %}aria-hidden="true" tabindex="-1"{% endif %}>{{ fw.name }}<span class="text-brand-500">◆</span></a>{% endfor %}
+    {% endfor %}
+  </div>
+</section>

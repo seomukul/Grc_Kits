@@ -1,0 +1,10 @@
+{# Designed product cover: used whenever a product has no cover image. #}
+<div class="relative grid aspect-[16/10] place-items-center overflow-hidden bg-brand-900 {{ cls }}">
+  <div class="absolute inset-0 opacity-[0.07]" style="background-image: linear-gradient(var(--color-brand-300) 1px, transparent 1px), linear-gradient(90deg, var(--color-brand-300) 1px, transparent 1px); background-size: 22px 22px;"></div>
+  <div class="absolute inset-3 border border-brand-400/30"></div>
+  <p class="relative px-8 text-center font-display text-2xl leading-tight text-slate-50 sm:text-[1.7rem]">{{ product.cover_text }}</p>
+  <div class="absolute inset-x-6 bottom-5 flex items-end justify-between gap-3 text-[10px] font-semibold uppercase tracking-[0.18em]">
+    <span class="truncate text-brand-300/80">{{ product.category.name }}</span>
+    <span class="shrink-0 text-slate-400">{{ product.get_product_type_display }}</span>
+  </div>
+</div>

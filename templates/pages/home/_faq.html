@@ -1,4 +1,4 @@
-<section class="container-page max-w-3xl py-14">
-  <h2 class="text-center text-2xl font-bold text-slate-900">{{ section.heading }}</h2>
+<section class="container-page max-w-3xl py-20">
+  <div class="text-center">{% if section.eyebrow %}<p class="eyebrow">{{ section.eyebrow }}</p>{% endif %}<h2 class="section-title">{{ section.heading }}</h2></div>
   {% include "partials/_faq_list.html" with faqs=items %}
 </section>

@@ -1,0 +1,12 @@
+<section class="container-page py-20">
+  {% include "pages/home/_section_head.html" %}
+  <ol class="mt-10 grid gap-6 md:grid-cols-3">
+    {% for title, text in items %}
+    <li class="card p-7">
+      <p class="font-display text-4xl text-brand-400">{{ forloop.counter|stringformat:"02d" }}</p>
+      <h3 class="mt-4 text-xl text-slate-900">{{ title }}</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-600">{{ text }}</p>
+    </li>
+    {% endfor %}
+  </ol>
+</section>

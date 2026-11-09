@@ -1,33 +1,86 @@
-<section class="relative overflow-hidden bg-brand-950 text-white"
-         x-data="{ i: 0, n: {{ items|length }}, timer: null,
-                   go(k) { this.i = (k + this.n) % this.n },
-                   start() { if (this.n > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.timer = setInterval(() => this.go(this.i + 1), 6000) },
-                   stop() { clearInterval(this.timer) } }"
-         x-init="start()" @mouseenter="stop()" @mouseleave="start()" @focusin="stop()"
-         aria-roledescription="carousel" aria-label="Highlights">
-  {% for slide in items %}
-  <div class="{% if not forloop.first %}hidden{% endif %} relative" :class="i === {{ forloop.counter0 }} ? '!block' : '!hidden'"
-       role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} of {{ items|length }}">
-    {% if slide.image %}
-      <img src="{{ slide.image.url }}" alt="" class="absolute inset-0 h-full w-full object-cover opacity-35" {% if not forloop.first %}loading="lazy"{% endif %}>
-    {% endif %}
-    <div class="absolute inset-0 bg-gradient-to-r from-brand-950 via-brand-950/85 to-brand-900/40"></div>
-    <div class="container-page relative py-20 lg:py-28">
-      {% if slide.eyebrow %}<p class="text-sm font-semibold uppercase tracking-wider text-accent-500">{{ slide.eyebrow }}</p>{% endif %}
-      {% if forloop.first %}<h1 class="mt-3 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">{{ slide.headline }}</h1>{% else %}<p class="mt-3 max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">{{ slide.headline }}</p>{% endif %}
-      {% if slide.subtext %}<p class="mt-6 max-w-2xl text-lg text-brand-100">{{ slide.subtext }}</p>{% endif %}
-      <div class="mt-8 flex flex-wrap gap-3">
-        {% if slide.button_label %}<a href="{{ slide.button_url }}" class="btn bg-white text-brand-900 hover:bg-brand-50">{{ slide.button_label }}</a>{% endif %}
-        {% if slide.secondary_label %}<a href="{{ slide.secondary_url }}" class="btn border border-white/30 text-white hover:bg-white/10">{{ slide.secondary_label }}</a>{% endif %}
+{% load pages_tags %}
+<section class="relative overflow-hidden bg-brand-900 text-slate-200">
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(194,155,76,0.16),transparent_55%)]"></div>
+  <div class="absolute inset-0 opacity-[0.04]" style="background-image: linear-gradient(var(--color-brand-300) 1px, transparent 1px), linear-gradient(90deg, var(--color-brand-300) 1px, transparent 1px); background-size: 48px 48px;"></div>
+
+  <div class="container-page relative grid items-center gap-12 pb-10 pt-16 lg:grid-cols-[1.25fr_1fr] lg:pt-24"
+       x-data="{ i: 0, n: {{ items|length }}, timer: null,
+                 go(k) { this.i = (k + this.n) % this.n },
+                 start() { if (this.n > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) this.timer = setInterval(() => this.go(this.i + 1), 7000) },
+                 stop() { clearInterval(this.timer) } }"
+       x-init="start()" @mouseenter="stop()" @mouseleave="start()" @focusin="stop()"
+       aria-roledescription="carousel" aria-label="Highlights">
+    <div class="min-h-[22rem]">
+      {% for slide in items %}
+      <div class="{% if not forloop.first %}hidden{% endif %}" :class="i === {{ forloop.counter0 }} ? '!block' : '!hidden'"
+           role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} of {{ items|length }}">
+        {% if slide.eyebrow %}<p class="eyebrow !text-brand-300">{{ slide.eyebrow }}</p>{% endif %}
+        {% if forloop.first %}
+          <h1 class="mt-5 text-4xl leading-[1.1] text-slate-50 sm:text-5xl lg:text-[3.4rem]">{{ slide.headline|gold }}</h1>
+        {% else %}
+          <p class="mt-5 font-display text-4xl font-semibold leading-[1.1] text-slate-50 sm:text-5xl lg:text-[3.4rem]">{{ slide.headline|gold }}</p>
+        {% endif %}
+        {% if slide.subtext %}<p class="mt-6 max-w-xl text-lg leading-relaxed text-slate-300">{{ slide.subtext }}</p>{% endif %}
+        <div class="mt-9 flex flex-wrap gap-3">
+          {% if slide.button_label %}<a href="{{ slide.button_url }}" class="btn-primary !px-6 !py-3">{{ slide.button_label }}</a>{% endif %}
+          {% if slide.secondary_label %}<a href="{{ slide.secondary_url }}" class="btn-ghost-light !px-6 !py-3">{{ slide.secondary_label }}</a>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      {% if items|length > 1 %}
+      <div class="mt-10 flex items-center gap-2">
+        {% for slide in items %}<button type="button" @click="go({{ forloop.counter0 }})" class="h-1 rounded-full transition-all" :class="i === {{ forloop.counter0 }} ? 'w-8 bg-brand-400' : 'w-4 bg-white/25 hover:bg-white/40'" aria-label="Go to slide {{ forloop.counter }}"></button>{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    {# Illustration: an "approved policy" document stack (pure HTML/CSS, no images). #}
+    <div class="relative mx-auto hidden w-full max-w-sm lg:block" aria-hidden="true">
+      <div class="absolute -right-4 top-6 h-full w-full rotate-6 rounded-md border border-white/10 bg-ink-700"></div>
+      <div class="absolute -right-2 top-3 h-full w-full rotate-3 rounded-md border border-white/10 bg-ink-800"></div>
+      <div class="relative rounded-md border border-brand-400/40 bg-paper p-7 text-slate-800 shadow-2xl">
+        <div class="flex items-center justify-between">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-700">Information Security Policy</p>
+          <p class="text-[10px] text-slate-500">v2.1</p>
+        </div>
+        <div class="mt-5 space-y-2">
+          <div class="h-2 w-11/12 rounded bg-slate-200"></div><div class="h-2 w-full rounded bg-slate-200"></div>
+          <div class="h-2 w-4/5 rounded bg-slate-200"></div><div class="h-2 w-10/12 rounded bg-slate-200"></div>
+        </div>
+        <ul class="mt-6 space-y-2.5 text-xs">
+          <li class="flex items-center gap-2"><span class="grid size-4 place-items-center rounded-full bg-brand-500 text-brand-950">✓</span>Scope &amp; context</li>
+          <li class="flex items-center gap-2"><span class="grid size-4 place-items-center rounded-full bg-brand-500 text-brand-950">✓</span>Roles &amp; responsibilities</li>
+          <li class="flex items-center gap-2"><span class="grid size-4 place-items-center rounded-full bg-brand-500 text-brand-950">✓</span>Risk treatment plan</li>
+          <li class="flex items-center gap-2"><span class="grid size-4 place-items-center rounded-full bg-brand-500 text-brand-950">✓</span>Statement of Applicability</li>
+        </ul>
+        <div class="mt-7 flex items-end justify-between border-t border-slate-200 pt-4">
+          <div><p class="text-[10px] uppercase tracking-wider text-slate-500">Approved by</p><p class="font-display text-lg italic text-slate-700">Management</p></div>
+          <div class="grid size-16 rotate-[-12deg] place-items-center rounded-full border-2 border-brand-500 text-center text-[8px] font-bold uppercase leading-tight tracking-wider text-brand-600">Audit<br>Ready</div>
+        </div>
       </div>
     </div>
   </div>
-  {% endfor %}
-  {% if items|length > 1 %}
-  <div class="absolute inset-x-0 bottom-6 flex items-center justify-center gap-2">
-    <button type="button" @click="go(i - 1)" class="rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white" aria-label="Previous slide">&#8249;</button>
-    {% for slide in items %}<button type="button" @click="go({{ forloop.counter0 }})" class="h-2 rounded-full transition-all" :class="i === {{ forloop.counter0 }} ? 'w-6 bg-white' : 'w-2 bg-white/40'" aria-label="Go to slide {{ forloop.counter }}"></button>{% endfor %}
-    <button type="button" @click="go(i + 1)" class="rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-white" aria-label="Next slide">&#8250;</button>
+
+  {# Framework search #}
+  <div class="container-page relative pb-16">
+    <form action="{% url 'catalog:list' %}" method="get" class="rounded-md border border-white/10 bg-ink-800/80 p-5 shadow-xl backdrop-blur sm:p-6" role="search">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-300">Find your framework</p>
+      <div class="mt-3 grid gap-3 md:grid-cols-[14rem_1fr_auto]">
+        <label for="hero-cat" class="sr-only">Discipline</label>
+        <select id="hero-cat" name="category" class="!border-white/10 !bg-brand-950 !text-slate-200" onchange="this.form.action = this.value ? '/kits/category/' + this.value + '/' : '{% url 'catalog:list' %}'">
+          <option value="">All disciplines</option>
+          {% for c in search_categories %}<option value="{{ c.slug }}">{{ c.name }}</option>{% endfor %}
+        </select>
+        <label for="hero-q" class="sr-only">Search</label>
+        <input id="hero-q" type="search" name="q" placeholder='Try "ISO 27001", "PCI DSS", "risk register"…' class="!border-white/10 !bg-brand-950 !text-slate-100 placeholder:!text-slate-500">
+        <button class="btn-primary !px-8">Search</button>
+      </div>
+      {% if search_frameworks %}
+      <div class="mt-4 flex flex-wrap items-center gap-2 text-xs">
+        <span class="mr-1 font-semibold uppercase tracking-[0.2em] text-slate-500">Popular:</span>
+        {% for fw in search_frameworks %}<a href="{% url 'catalog:list' %}?framework={{ fw.slug }}" class="rounded-full border border-white/15 px-3 py-1 text-slate-300 hover:border-brand-400 hover:text-brand-200">{{ fw.name }}</a>{% endfor %}
+      </div>
+      {% endif %}
+    </form>
   </div>
-  {% endif %}
 </section>

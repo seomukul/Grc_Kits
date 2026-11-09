@@ -28,9 +28,12 @@ class Framework(TimeStampedModel):
 
 
 class Category(TimeStampedModel):
+    ICONS = ["shield", "lock", "scale", "audit", "risk", "training", "globe", "badge"]
+
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
+    icon = models.CharField(max_length=20, default="shield", choices=[(i, i.title()) for i in ICONS])
     order = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
@@ -100,7 +103,14 @@ class Product(TimeStampedModel):
     whats_included = models.TextField(blank=True, help_text="One item per line.")
     system_requirements = models.CharField(max_length=200, blank=True, help_text="e.g. Microsoft Excel 2016 or later")
 
-    image = models.ImageField("cover image", upload_to="products/covers/", blank=True)
+    cover_label = models.CharField(
+        max_length=40, blank=True,
+        help_text="Big text on the product card cover, e.g. 'ISO/IEC 27001:2022'. Defaults to the first framework.",
+    )
+    image = models.ImageField(
+        "cover image", upload_to="products/covers/", blank=True,
+        help_text="Optional. Without an image the card shows a designed cover with the label above.",
+    )
     preview_video_url = models.URLField(blank=True, help_text="YouTube or Vimeo link.")
     sample_file = models.FileField(
         upload_to="products/samples/", blank=True, help_text="Public sample (e.g. a few PDF pages) buyers can view."
@@ -165,6 +175,13 @@ class Product(TimeStampedModel):
             return False
         s = site_settings or SiteSettings.load()
         return sales >= s.bestseller_min_sales
+
+    @property
+    def cover_text(self):
+        if self.cover_label:
+            return self.cover_label
+        fw = next(iter(self.frameworks.all()), None)
+        return fw.name if fw else self.title
 
     @property
     def included_items(self):

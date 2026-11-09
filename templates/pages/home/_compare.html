@@ -1,0 +1,22 @@
+<section class="bg-brand-900 py-20 text-slate-200">
+  <div class="container-page">
+    {% include "pages/home/_section_head.html" with dark=True %}
+    <div class="mt-10 grid gap-6 md:grid-cols-2">
+      <div class="rounded-md border border-white/10 p-7">
+        <h3 class="text-xl text-slate-50">Hiring a consultant</h3>
+        <p class="mt-1 text-[11px] uppercase tracking-[0.2em] text-slate-400">The traditional route</p>
+        <ul class="mt-6 space-y-4 text-sm">
+          {% for row in items.consultant %}<li class="flex gap-3"><span class="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-slate-500 text-slate-400">–</span>{{ row }}</li>{% endfor %}
+        </ul>
+      </div>
+      <div class="rounded-md border border-brand-400/60 bg-gradient-to-br from-ink-800 to-brand-900 p-7 shadow-[0_0_0_1px_rgba(194,155,76,0.15)]">
+        <h3 class="text-xl text-brand-200">A GRCkits toolkit</h3>
+        <p class="mt-1 text-[11px] uppercase tracking-[0.2em] text-brand-400">The head start</p>
+        <ul class="mt-6 space-y-4 text-sm">
+          {% for row in items.toolkit %}<li class="flex gap-3"><span class="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-brand-500 text-brand-950">{% include "partials/_icon.html" with name="check" cls="size-3.5" %}</span>{{ row }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% if section.button_label %}<p class="mt-8 text-center text-sm text-slate-400"><a href="{{ section.button_url }}" class="text-brand-300 underline underline-offset-4 hover:text-brand-200">{{ section.button_label }} &rarr;</a></p>{% endif %}
+  </div>
+</section>

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block main_class %}{% endblock %}
 {% block content %}
 {% for block in sections %}
   {% with section=block.section items=block.items %}{% include block.template %}{% endwith %}

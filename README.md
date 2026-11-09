@@ -138,6 +138,17 @@ Spam protection on forms: a honeypot field, a minimum fill time, a signed form t
 
 Guest checkout works. Buyers find past purchases in My Library (`/dashboard/`) after signing in with the email link.
 
+## Design system
+
+An editorial, "auditor-grade" look: midnight navy, gold and warm paper, with serif display headings.
+- **Tokens** live in `frontend/tailwind.css`. `brand-50…800` is gold, `brand-900/950` is navy, and `slate-*` is overridden with warm paper-to-ink neutrals, so plain `slate` classes already match the theme. `bg-paper` is the card surface.
+- **Utilities:**
+  - Buttons: `btn-primary` (gold gradient), `btn-secondary`, `btn-ghost-light` (for dark backgrounds).
+  - Cards: `card` and `card-hover`.
+  - Headings: `eyebrow` (small uppercase label with a gold rule) and `section-title`.
+- **Product covers:** a product without an image gets a designed navy cover showing `cover_label`, or its first framework if there's no label. Its category and product type appear along the bottom.
+- **Hero headline:** wrap words in `*stars*` to show them in gold.
+
 ## Frontend conventions
 
 - **Tailwind v4** is configured in CSS (`frontend/tailwind.css`, `@theme`), not in a JS config. Brand colours are `brand-*` and `accent-*`. Shared utilities are `btn-primary`, `btn-secondary`, `card` and `container-page`.

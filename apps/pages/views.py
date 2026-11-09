@@ -44,8 +44,9 @@ def _section_items(section):
     if section.key == key.NEW_ARRIVALS:
         return list(_products().order_by("-created_at")[:n]) or None
     if section.key == key.BROWSE:
-        frameworks = list(Framework.objects.annotate(n=Count("products", filter=Q(products__status="published"))))
-        categories = list(Category.objects.annotate(n=Count("products", filter=Q(products__status="published"))))
+        published = Q(products__status="published")
+        frameworks = list(Framework.objects.annotate(n=Count("products", filter=published)))
+        categories = list(Category.objects.annotate(n=Count("products", filter=published)))
         return {"frameworks": frameworks, "categories": categories} if frameworks or categories else None
     if section.key == key.BUNDLES:
         return list(_products().filter(product_type=Product.ProductType.BUNDLE).prefetch_related("bundle_items")[:n]) or None
@@ -59,6 +60,17 @@ def _section_items(section):
         return True
     if section.key == key.FAQ:
         return list(FAQItem.objects.filter(show_on_home=True)[:n]) or None
+    if section.key == key.MARQUEE:
+        return list(Framework.objects.all()) or None
+    if section.key in (key.STEPS, key.INSIDE):
+        return section.blocks or None
+    if section.key == key.COMPARE:
+        rows = {"consultant": section.compare_rows("consultant"), "toolkit": section.compare_rows("toolkit")}
+        return rows if rows["consultant"] or rows["toolkit"] else None
+    if section.key == key.AUTHOR:
+        return AboutProfile.load()
+    if section.key == key.CTA:
+        return True
     return None
 
 
@@ -71,7 +83,13 @@ def home(request):
     return render(
         request,
         "pages/home.html",
-        {"sections": sections, "site_settings": SiteSettings.load(), "subscribe_form": SubscribeForm()},
+        {
+            "sections": sections,
+            "site_settings": SiteSettings.load(),
+            "subscribe_form": SubscribeForm(),
+            "search_categories": Category.objects.all(),
+            "search_frameworks": Framework.objects.all()[:10],
+        },
     )
 
 

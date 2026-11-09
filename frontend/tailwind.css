@@ -6,55 +6,114 @@
 @source "../templates";
 @source "../apps";
 
+/*
+ * GRCkits design tokens: "auditor-grade" editorial look.
+ *   brand-50…800  = gold (accents, links, highlights)
+ *   brand-900/950 = midnight navy (dark bands, headings on light)
+ *   slate-*       = warm paper → ink neutrals (overrides Tailwind's cool slate site-wide)
+ */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", Georgia, serif;
 
-  --color-brand-50: oklch(97% 0.014 255);
-  --color-brand-100: oklch(93% 0.032 255);
-  --color-brand-200: oklch(87% 0.062 256);
-  --color-brand-300: oklch(78% 0.105 257);
-  --color-brand-400: oklch(68% 0.155 259);
-  --color-brand-500: oklch(58% 0.19 262);
-  --color-brand-600: oklch(50% 0.2 264);
-  --color-brand-700: oklch(43% 0.18 265);
-  --color-brand-800: oklch(36% 0.14 266);
-  --color-brand-900: oklch(29% 0.1 267);
-  --color-brand-950: oklch(20% 0.07 268);
+  --color-brand-50: #fbf7ee;
+  --color-brand-100: #f5ecd6;
+  --color-brand-200: #ebd9ae;
+  --color-brand-300: #e6cb86;
+  --color-brand-400: #d6b467;
+  --color-brand-500: #c29b4c;
+  --color-brand-600: #a8823a;
+  --color-brand-700: #8a6a2e;
+  --color-brand-800: #6b5226;
+  --color-brand-900: #0e1622;
+  --color-brand-950: #0a1019;
 
-  --color-accent-500: oklch(70% 0.15 162);
-  --color-accent-600: oklch(60% 0.14 163);
+  --color-accent-500: #e6cb86;
+  --color-accent-600: #c29b4c;
+
+  --color-slate-50: #f3efe6;
+  --color-slate-100: #ece6d9;
+  --color-slate-200: #e1d8c6;
+  --color-slate-300: #cfc3ac;
+  --color-slate-400: #a79c88;
+  --color-slate-500: #7a7466;
+  --color-slate-600: #5c5a55;
+  --color-slate-700: #3f4450;
+  --color-slate-800: #262e3b;
+  --color-slate-900: #0e1622;
+  --color-slate-950: #080d15;
+
+  --color-paper: #fcfbf8;
+  --color-ink-800: #172131;
+  --color-ink-700: #1f2b3d;
+
+  --animate-marquee: marquee 40s linear infinite;
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 }
 
 @layer base {
   [x-cloak] { display: none !important; }
 
+  h1, h2, h3, .font-display { font-family: var(--font-display); letter-spacing: -0.01em; }
+  h1, h2 { font-weight: 600; }
+
   input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
   select,
   textarea {
-    @apply w-full rounded-lg border-slate-300 shadow-sm focus:border-brand-500 focus:ring-brand-500;
+    @apply w-full rounded-md border-slate-300 bg-paper shadow-sm focus:border-brand-500 focus:ring-brand-500;
   }
+  input[type="checkbox"], input[type="radio"] { @apply text-brand-600 focus:ring-brand-500; }
   label { @apply mb-1 block text-sm font-medium text-slate-700; }
+  ::selection { background: var(--color-brand-300); color: var(--color-brand-950); }
 }
 
 /* Reusable utilities (Tailwind v4: @utility so they can be @apply'd and use variants). */
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60;
+  @apply inline-flex items-center justify-center gap-2 rounded-sm px-5 py-2.5 text-sm font-semibold tracking-wide transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60;
 }
 @utility btn-primary {
-  @apply btn bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-500;
+  @apply btn text-brand-950 shadow-sm hover:brightness-105 focus-visible:ring-brand-500;
+  background-image: linear-gradient(105deg, var(--color-brand-500) 0%, var(--color-brand-300) 50%, var(--color-brand-500) 100%);
+  background-size: 200% 100%;
+  transition: background-position 400ms, filter 150ms;
+  &:hover { background-position: 100% 0; }
 }
 @utility btn-secondary {
-  @apply btn border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 focus-visible:ring-slate-400;
+  @apply btn border border-slate-300 bg-paper text-slate-900 hover:border-brand-500 hover:bg-white focus-visible:ring-slate-400;
+}
+@utility btn-ghost-light {
+  @apply btn border border-white/25 text-white hover:border-brand-300 hover:text-brand-200;
 }
 @utility container-page {
   @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
 }
 @utility card {
-  @apply rounded-2xl border border-slate-200 bg-white shadow-sm;
+  @apply rounded-md border border-slate-200 bg-paper shadow-[0_1px_2px_rgba(14,22,34,0.04)];
+}
+@utility card-hover {
+  @apply transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-[0_12px_30px_-12px_rgba(14,22,34,0.25)];
+}
+/* Small uppercase label with a gold rule, used above section headings. */
+@utility eyebrow {
+  @apply inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-brand-600;
+  &::before { content: ""; width: 2rem; height: 1px; background: currentColor; }
+}
+@utility section-title {
+  @apply mt-3 text-3xl text-slate-900 sm:text-4xl;
+}
+@utility text-gold {
+  @apply text-brand-300;
 }
 
-.errorlist { @apply mt-1 text-sm text-red-600; }
+.errorlist { @apply mt-1 text-sm text-red-700; }
 
 /* HTMX request indicator */
 .htmx-indicator { opacity: 0; transition: opacity 150ms; }
 .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
+}

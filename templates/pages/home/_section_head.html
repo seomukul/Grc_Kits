@@ -1,7 +1,8 @@
-<div class="flex flex-wrap items-end justify-between gap-4">
-  <div>
-    <h2 class="text-2xl font-bold text-slate-900">{{ section.heading }}</h2>
-    {% if section.subtitle %}<p class="mt-1 text-slate-600">{{ section.subtitle }}</p>{% endif %}
+<div class="flex flex-wrap items-end justify-between gap-4 {{ head_cls }}">
+  <div class="max-w-2xl">
+    {% if section.eyebrow %}<p class="eyebrow">{{ section.eyebrow }}</p>{% endif %}
+    <h2 class="section-title {% if dark %}!text-slate-50{% endif %}">{{ section.heading }}</h2>
+    {% if section.subtitle %}<p class="mt-3 {% if dark %}text-slate-300{% else %}text-slate-600{% endif %}">{{ section.subtitle }}</p>{% endif %}
   </div>
-  {% if link %}<a href="{{ link }}" class="text-sm font-semibold text-brand-600 hover:underline">{{ link_label|default:"View all" }} &rarr;</a>{% endif %}
+  {% if link %}<a href="{{ link }}" class="text-sm font-semibold uppercase tracking-wider text-brand-600 hover:text-brand-700">{{ link_label|default:"View all" }} &rarr;</a>{% endif %}
 </div>

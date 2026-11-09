@@ -19,20 +19,23 @@ FRAMEWORKS = [
     ("Network Security", "network-security"),
 ]
 
+# (name, slug, icon, description): "disciplines" shown as tiles on the home page.
 CATEGORIES = [
-    ("Toolkits", "toolkits"),
-    ("Policy templates", "policies"),
-    ("Risk & audit tools", "risk-audit"),
-    ("Checklists", "checklists"),
+    ("Information Security & Cybersecurity", "toolkits", "shield", "ISO 27001, NIST CSF, SOC 2 and the controls that protect your information."),
+    ("Data Privacy & Protection", "policies", "lock", "GDPR-style privacy programs, notices, DPIAs and records of processing."),
+    ("Governance, Risk & Compliance", "risk-audit", "scale", "Risk registers, compliance trackers and board-ready reporting."),
+    ("Audit & Assurance", "checklists", "audit", "Internal audit programs, checklists and evidence trackers."),
+    ("AI Governance", "ai-governance", "badge", "ISO 42001 and responsible-AI policies for teams adopting AI."),
+    ("Banking & Financial Regulation", "banking", "globe", "Bangladesh Bank BB CSF, PCI DSS and financial-sector requirements."),
 ]
 
 # title, category slug, type, frameworks, price, featured, team/org tiers
 PRODUCTS = [
     ("ISO 27001 Risk Register", "risk-audit", "excel", ["iso-27001"], "49.00", True, True),
-    ("Information Security Policy Pack", "policies", "word", ["iso-27001", "nist-csf", "soc-2"], "79.00", True, True),
-    ("ISO 42001 AI Governance Policy", "policies", "word", ["iso-42001"], "59.00", False, True),
-    ("PCI DSS Readiness Checklist", "checklists", "pdf", ["pci-dss"], "29.00", False, False),
-    ("BB CSF Compliance Tracker", "risk-audit", "excel", ["bb-csf"], "69.00", True, True),
+    ("Information Security Policy Pack", "toolkits", "word", ["iso-27001", "nist-csf", "soc-2"], "79.00", True, True),
+    ("ISO 42001 AI Governance Policy", "ai-governance", "word", ["iso-42001"], "59.00", False, True),
+    ("PCI DSS Readiness Checklist", "banking", "pdf", ["pci-dss"], "29.00", False, False),
+    ("BB CSF Compliance Tracker", "banking", "excel", ["bb-csf"], "69.00", True, True),
     ("Firewall Rule Review Checklist", "checklists", "pdf", ["network-security"], "19.00", False, False),
 ]
 
@@ -46,8 +49,10 @@ class Command(BaseCommand):
         for i, (name, slug) in enumerate(FRAMEWORKS):
             fws[slug], _ = Framework.objects.get_or_create(slug=slug, defaults={"name": name, "order": i})
         cats = {}
-        for i, (name, slug) in enumerate(CATEGORIES):
-            cats[slug], _ = Category.objects.get_or_create(slug=slug, defaults={"name": name, "order": i})
+        for i, (name, slug, icon, desc) in enumerate(CATEGORIES):
+            cats[slug], _ = Category.objects.update_or_create(
+                slug=slug, defaults={"name": name, "order": i, "icon": icon, "description": desc}
+            )
 
         products = {}
         for title, cat, ptype, fw_slugs, price, featured, tiers in PRODUCTS:

@@ -1,0 +1,15 @@
+{% with profile=items %}
+<section class="container-page py-20">
+  <div class="grid items-center gap-10 rounded-md border border-slate-200 bg-paper p-8 md:grid-cols-[14rem_1fr] md:p-12">
+    {% if profile.photo %}<img src="{{ profile.photo.url }}" alt="{{ profile.name }}" class="aspect-square w-56 rounded-md object-cover grayscale-[30%]">{% else %}<div class="grid aspect-square w-56 place-items-center rounded-md bg-brand-900 font-display text-6xl text-brand-300">{{ profile.name|first }}</div>{% endif %}
+    <div>
+      {% if section.eyebrow %}<p class="eyebrow">{{ section.eyebrow }}</p>{% endif %}
+      <h2 class="section-title">{{ section.heading }}</h2>
+      <p class="mt-4 font-display text-xl text-slate-800">{{ profile.name }} <span class="text-slate-500">· {{ profile.headline }}</span></p>
+      {% if profile.certification_list %}<ul class="mt-4 flex flex-wrap gap-2">{% for c in profile.certification_list %}<li class="rounded-sm border border-brand-400/60 bg-brand-50 px-2.5 py-0.5 text-xs font-semibold tracking-wider text-brand-800">{{ c }}</li>{% endfor %}</ul>{% endif %}
+      <div class="mt-4 line-clamp-4 text-slate-600 [&_p]:mb-2">{{ profile.bio|safe }}</div>
+      {% if section.button_label %}<a href="{{ section.button_url }}" class="btn-secondary mt-6">{{ section.button_label }}</a>{% endif %}
+    </div>
+  </div>
+</section>
+{% endwith %}

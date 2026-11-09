@@ -5,7 +5,7 @@
       <ul class="card divide-y divide-slate-100">
         {% for line in lines %}
         <li class="flex items-center gap-4 p-4">
-          {% if line.product.image %}<img src="{{ line.product.image.url }}" alt="" class="size-16 rounded-lg object-cover">{% else %}<div class="grid size-16 place-items-center rounded-lg bg-brand-50 text-xl font-bold text-brand-300">{{ line.product.title|first }}</div>{% endif %}
+          {% if line.product.image %}<img src="{{ line.product.image.url }}" alt="" class="size-16 shrink-0 rounded-sm object-cover">{% else %}<div class="grid size-16 shrink-0 place-items-center rounded-sm border border-brand-400/40 bg-brand-900 px-1 text-center font-display text-[10px] leading-tight text-slate-100">{{ line.product.cover_text|truncatechars:22 }}</div>{% endif %}
           <div class="min-w-0 flex-1">
             <a href="{{ line.product.get_absolute_url }}" class="font-medium text-slate-900 hover:text-brand-700">{{ line.product.title }}</a>
             <p class="text-sm text-slate-500">{{ line.tier_label }} license · {{ line.product.get_product_type_display }}</p>

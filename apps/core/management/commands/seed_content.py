@@ -217,8 +217,8 @@ SERVICES = [
 
 HERO_SLIDES = [
     {
-        "eyebrow": "Built by a practicing GRC professional",
-        "headline": "Audit-ready GRC templates & toolkits",
+        "eyebrow": "Auditor-written · Editable · Instant download",
+        "headline": "GRC & compliance toolkits, *written by a working auditor*",
         "subtext": "Policies, risk registers, checklists and dashboards for ISO 27001, ISO 42001, NIST, PCI DSS and BB CSF. Download, customise, pass your audit.",
         "button_label": "Browse kits", "button_url": "/kits/",
         "secondary_label": "Get expert help", "secondary_url": "/services/",
