@@ -1,0 +1,12 @@
+{% autoescape off %}Thanks for your purchase from {{ SITE_NAME }}!
+
+Order: {{ order.short_number }}
+Total: ${{ order.total }} {{ order.currency|upper }}
+
+Your downloads:
+{% for ent in entitlements %}- {{ ent.product.title }}: {{ SITE_URL }}{{ ent.get_absolute_url }}
+{% endfor %}
+Keep this email: the links above are your access to the files.
+
+– The {{ SITE_NAME }} team
+{% endautoescape %}

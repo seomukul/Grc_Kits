@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Your downloads – {{ SITE_NAME }}{% endblock %}
+{% block extra_head %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+{% block content %}
+<div class="container-page max-w-3xl py-12">
+  <h1 class="text-2xl font-bold text-slate-900">{{ entitlement.product.title }}</h1>
+  <p class="mt-1 text-sm text-slate-500">
+    {{ entitlement.download_count }} of {{ entitlement.max_downloads }} downloads used
+    {% if entitlement.expires_at %}· access until {{ entitlement.expires_at|date:"M j, Y" }}{% endif %}
+  </p>
+  {% if not entitlement.is_usable %}
+    <p class="mt-6 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">This link has expired or reached its download limit. Contact us and we'll help.</p>
+  {% else %}
+  <ul class="card mt-6 divide-y divide-slate-100">
+    {% for f in files %}
+    <li class="flex items-center justify-between p-4">
+      <div><p class="font-medium text-slate-900">{{ f.title }}</p><p class="text-xs text-slate-500">Version {{ f.version }}</p></div>
+      <a href="{% url 'downloads:file' entitlement.token f.pk %}" class="btn-primary">Download</a>
+    </li>
+    {% empty %}
+    <li class="p-4 text-sm text-slate-500">Files are being prepared. Check back shortly.</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endblock %}

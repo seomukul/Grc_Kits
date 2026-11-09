@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Page not found – {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container-page max-w-xl py-24 text-center">
+  <p class="text-sm font-semibold text-brand-600">404</p>
+  <h1 class="mt-2 text-3xl font-bold text-slate-900">Page not found</h1>
+  <p class="mt-3 text-slate-600">The page you're looking for doesn't exist or has moved.</p>
+  <a href="{% url 'pages:home' %}" class="btn-primary mt-8">Go home</a>
+</div>
+{% endblock %}

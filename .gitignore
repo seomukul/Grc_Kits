@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+db.sqlite3
+/media/
+/private_media/
+/staticfiles/
+/assets/css/tailwind.css
+.django_tailwind_cli/
+.DS_Store
+.claude/settings.local.json

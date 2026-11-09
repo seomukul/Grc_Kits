@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order.short_number }} – {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container-page max-w-3xl py-12">
+  <a href="{% url 'dashboard:home' %}" class="text-sm text-brand-600 hover:underline">&larr; My account</a>
+  <h1 class="mt-4 text-2xl font-bold text-slate-900">Order {{ order.short_number }}</h1>
+  <p class="text-sm text-slate-500">{{ order.created_at|date:"M j, Y" }} · {{ order.get_status_display }}</p>
+  <div class="card mt-6 divide-y divide-slate-100">
+    {% for item in order.items.all %}
+    <div class="flex items-center justify-between p-4">
+      <div>
+        <p class="font-medium text-slate-900">{{ item.product_title }}</p>
+        {% for ent in item.entitlements.all %}<a href="{{ ent.get_absolute_url }}" class="text-sm text-brand-600 hover:underline">Download files</a>{% endfor %}
+      </div>
+      <p class="font-medium">${{ item.line_total }}</p>
+    </div>
+    {% endfor %}
+    <div class="flex justify-between p-4 font-semibold"><span>Total</span><span>${{ order.total }} {{ order.currency|upper }}</span></div>
+  </div>
+</div>
+{% endblock %}

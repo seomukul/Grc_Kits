@@ -1,0 +1,11 @@
+<form hx-post="{% url 'marketing:subscribe' %}" hx-swap="outerHTML" class="space-y-2">
+  {% csrf_token %}
+  <label for="nl-email-{{ source|default:'x' }}">Get new templates & compliance tips</label>
+  <div class="flex gap-2">
+    <input id="nl-email-{{ source|default:'x' }}" type="email" name="email" required placeholder="you@company.com" value="{{ form.email.value|default:'' }}">
+    <input type="hidden" name="source" value="{% if source %}{{ source }}{% else %}{{ form.source.value|default:'' }}{% endif %}">
+    <input type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button class="btn-primary shrink-0">Subscribe <span class="htmx-indicator">…</span></button>
+  </div>
+  {% if form.errors %}<p class="errorlist">Please enter a valid email address.</p>{% endif %}
+</form>

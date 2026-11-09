@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "grckits",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["manage.py", "tailwind", "runserver", "8000"],
+      "port": 8000
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{% if category %}{{ category.name }}{% else %}All kits & templates{% endif %} – {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container-page py-12">
+  <h1 class="text-3xl font-bold text-slate-900">{% if category %}{{ category.name }}{% else %}Kits & templates{% endif %}</h1>
+  {% if category.description %}<p class="mt-2 max-w-2xl text-slate-600">{{ category.description }}</p>{% endif %}
+
+  <div class="mt-8 grid gap-8 lg:grid-cols-[16rem_1fr]">
+    <aside class="space-y-6">
+      <form hx-get="{{ request.path }}" hx-target="#product-grid" hx-swap="outerHTML" hx-push-url="true"
+            hx-trigger="input changed delay:300ms from:input[name=q], change from:select" class="space-y-4">
+        <div>
+          <label for="q">Search</label>
+          <input id="q" type="search" name="q" value="{{ q }}" placeholder="e.g. access control">
+        </div>
+        <div>
+          <label for="framework">Framework</label>
+          <select id="framework" name="framework">
+            <option value="">All frameworks</option>
+            {% for fw in frameworks %}<option value="{{ fw.slug }}" {% if fw.slug == active_framework %}selected{% endif %}>{{ fw.name }}</option>{% endfor %}
+          </select>
+        </div>
+      </form>
+      <div>
+        <p class="text-sm font-semibold text-slate-900">Categories</p>
+        <ul class="mt-2 space-y-1 text-sm">
+          <li><a href="{% url 'catalog:list' %}" class="{% if not category %}font-semibold text-brand-700{% else %}text-slate-600 hover:text-brand-600{% endif %}">All</a></li>
+          {% for c in categories %}<li><a href="{{ c.get_absolute_url }}" class="{% if c == category %}font-semibold text-brand-700{% else %}text-slate-600 hover:text-brand-600{% endif %}">{{ c.name }}</a></li>{% endfor %}
+        </ul>
+      </div>
+    </aside>
+    {% include "catalog/_product_grid.html" %}
+  </div>
+</div>
+{% endblock %}

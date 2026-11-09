@@ -1,0 +1,16 @@
+<div id="product-grid">
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {% for product in products %}
+      {% include "catalog/_product_card.html" %}
+    {% empty %}
+      <p class="col-span-full py-12 text-center text-slate-500">No kits match your filters.</p>
+    {% endfor %}
+  </div>
+  {% if is_paginated %}
+  <nav class="mt-10 flex justify-center gap-2" aria-label="Pagination">
+    {% if page_obj.has_previous %}<a class="btn-secondary" href="?page={{ page_obj.previous_page_number }}&q={{ q|urlencode }}&framework={{ active_framework }}">Previous</a>{% endif %}
+    <span class="px-3 py-2 text-sm text-slate-600">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a class="btn-secondary" href="?page={{ page_obj.next_page_number }}&q={{ q|urlencode }}&framework={{ active_framework }}">Next</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>

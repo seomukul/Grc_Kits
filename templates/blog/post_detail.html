@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ post.meta_title|default:post.title }} – {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ post.meta_description|default:post.excerpt }}{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block content %}
+<article class="container-page max-w-3xl py-12">
+  <p class="text-sm text-slate-500">{{ post.published_at|date:"M j, Y" }}{% if post.author %} · {{ post.author.get_full_name|default:post.author.username }}{% endif %}</p>
+  <h1 class="mt-2 text-4xl font-bold tracking-tight text-slate-900">{{ post.title }}</h1>
+  {% if post.cover_image %}<img src="{{ post.cover_image.url }}" alt="" class="mt-8 w-full rounded-2xl">{% endif %}
+  <div class="prose prose-slate prose-lg mt-8 max-w-none">{{ post.body|safe }}</div>
+
+  {% with related=post.related_products.all %}
+  {% if related %}
+  <aside class="mt-16">
+    <h2 class="text-xl font-semibold text-slate-900">Related kits</h2>
+    <div class="mt-4 grid gap-6 sm:grid-cols-2">{% for product in related %}{% include "catalog/_product_card.html" %}{% endfor %}</div>
+  </aside>
+  {% endif %}
+  {% endwith %}
+</article>
+{% endblock %}

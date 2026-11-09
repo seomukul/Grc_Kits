@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}My account – {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container-page py-12">
+  <h1 class="text-3xl font-bold text-slate-900">Welcome{% if user.first_name %}, {{ user.first_name }}{% endif %}</h1>
+
+  <section class="mt-10">
+    <h2 class="text-xl font-semibold text-slate-900">My downloads</h2>
+    <div class="mt-4 grid gap-4 md:grid-cols-2">
+      {% for ent in entitlements %}
+      <div class="card flex items-center justify-between p-5">
+        <div>
+          <p class="font-medium text-slate-900">{{ ent.order_item.product.title }}</p>
+          <p class="text-xs text-slate-500">{{ ent.download_count }}/{{ ent.max_downloads }} downloads used</p>
+        </div>
+        <a href="{{ ent.get_absolute_url }}" class="btn-primary">Open</a>
+      </div>
+      {% empty %}
+      <p class="text-slate-500">No purchases yet. <a href="{% url 'catalog:list' %}" class="text-brand-600 hover:underline">Browse kits</a>.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="mt-12">
+    <h2 class="text-xl font-semibold text-slate-900">Order history</h2>
+    <div class="card mt-4 overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-100 text-sm">
+        <thead class="bg-slate-50 text-left text-slate-500"><tr><th class="px-4 py-3">Order</th><th class="px-4 py-3">Date</th><th class="px-4 py-3">Status</th><th class="px-4 py-3 text-right">Total</th></tr></thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for o in orders %}
+          <tr><td class="px-4 py-3"><a href="{{ o.get_absolute_url }}" class="font-medium text-brand-600 hover:underline">{{ o.short_number }}</a></td><td class="px-4 py-3">{{ o.created_at|date:"M j, Y" }}</td><td class="px-4 py-3">{{ o.get_status_display }}</td><td class="px-4 py-3 text-right">${{ o.total }}</td></tr>
+          {% empty %}
+          <tr><td colspan="4" class="px-4 py-6 text-center text-slate-500">No orders yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

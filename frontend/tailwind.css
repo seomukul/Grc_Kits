@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+
+/* Scan Django templates and Python (for classes set in forms/views). */
+@source "../templates";
+@source "../apps";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50: oklch(97% 0.014 255);
+  --color-brand-100: oklch(93% 0.032 255);
+  --color-brand-200: oklch(87% 0.062 256);
+  --color-brand-300: oklch(78% 0.105 257);
+  --color-brand-400: oklch(68% 0.155 259);
+  --color-brand-500: oklch(58% 0.19 262);
+  --color-brand-600: oklch(50% 0.2 264);
+  --color-brand-700: oklch(43% 0.18 265);
+  --color-brand-800: oklch(36% 0.14 266);
+  --color-brand-900: oklch(29% 0.1 267);
+  --color-brand-950: oklch(20% 0.07 268);
+
+  --color-accent-500: oklch(70% 0.15 162);
+  --color-accent-600: oklch(60% 0.14 163);
+}
+
+@layer base {
+  [x-cloak] { display: none !important; }
+
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+  select,
+  textarea {
+    @apply w-full rounded-lg border-slate-300 shadow-sm focus:border-brand-500 focus:ring-brand-500;
+  }
+  label { @apply mb-1 block text-sm font-medium text-slate-700; }
+}
+
+/* Reusable utilities (Tailwind v4: @utility so they can be @apply'd and use variants). */
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60;
+}
+@utility btn-primary {
+  @apply btn bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-500;
+}
+@utility btn-secondary {
+  @apply btn border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 focus-visible:ring-slate-400;
+}
+@utility container-page {
+  @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+@utility card {
+  @apply rounded-2xl border border-slate-200 bg-white shadow-sm;
+}
+
+.errorlist { @apply mt-1 text-sm text-red-600; }
+
+/* HTMX request indicator */
+.htmx-indicator { opacity: 0; transition: opacity 150ms; }
+.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }

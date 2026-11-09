@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Blog – {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container-page max-w-4xl py-12">
+  <h1 class="text-3xl font-bold text-slate-900">Blog</h1>
+  <div class="mt-8 space-y-6">
+    {% for post in posts %}
+    <a href="{{ post.get_absolute_url }}" class="card block p-6 hover:border-brand-300">
+      <p class="text-xs text-slate-500">{{ post.published_at|date:"M j, Y" }}</p>
+      <h2 class="mt-1 text-xl font-semibold text-slate-900">{{ post.title }}</h2>
+      <p class="mt-2 text-slate-600">{{ post.excerpt }}</p>
+    </a>
+    {% empty %}
+    <p class="text-slate-500">No posts yet.</p>
+    {% endfor %}
+  </div>
+  {% if is_paginated %}
+  <nav class="mt-10 flex justify-center gap-2">
+    {% if page_obj.has_previous %}<a class="btn-secondary" href="?page={{ page_obj.previous_page_number }}">Newer</a>{% endif %}
+    {% if page_obj.has_next %}<a class="btn-secondary" href="?page={{ page_obj.next_page_number }}">Older</a>{% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

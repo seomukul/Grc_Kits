@@ -1,0 +1,16 @@
+<a href="{{ product.get_absolute_url }}" class="card group flex flex-col overflow-hidden hover:border-brand-300">
+  {% if product.image %}
+    <img src="{{ product.image.url }}" alt="" class="aspect-[16/9] w-full object-cover" loading="lazy">
+  {% else %}
+    <div class="grid aspect-[16/9] place-items-center bg-brand-50 text-3xl font-bold text-brand-300">{{ product.title|first }}</div>
+  {% endif %}
+  <div class="flex flex-1 flex-col p-5">
+    <p class="text-xs font-medium uppercase tracking-wide text-brand-600">{{ product.category.name }}</p>
+    <h3 class="mt-1 font-semibold text-slate-900 group-hover:text-brand-700">{{ product.title }}</h3>
+    <p class="mt-2 line-clamp-2 text-sm text-slate-600">{{ product.short_description }}</p>
+    <div class="mt-auto flex items-baseline gap-2 pt-4">
+      <span class="text-lg font-bold text-slate-900">${{ product.price }}</span>
+      {% if product.compare_at_price %}<span class="text-sm text-slate-400 line-through">${{ product.compare_at_price }}</span>{% endif %}
+    </div>
+  </div>
+</a>

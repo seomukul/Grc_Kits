@@ -1,0 +1,37 @@
+{% load static tailwind_cli %}<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}{{ SITE_NAME }} – Compliance templates & GRC toolkits{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Ready-to-use ISO 27001, SOC 2, HIPAA and NIST policy templates and GRC toolkits.{% endblock %}">
+  <link rel="canonical" href="{{ SITE_URL }}{{ request.path }}">
+  {% block og %}
+  <meta property="og:site_name" content="{{ SITE_NAME }}">
+  <meta property="og:title" content="{% block og_title %}{{ SITE_NAME }}{% endblock %}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ SITE_URL }}{{ request.path }}">
+  {% endblock %}
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  {% tailwind_css %}
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
+  <script src="{% static 'js/app.js' %}" defer></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="flex min-h-full flex-col bg-slate-50 font-sans text-slate-800 antialiased" hx-boost="false">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">Skip to content</a>
+
+  {% include "partials/_header.html" %}
+  {% include "partials/_messages.html" %}
+
+  <main id="main" class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/_footer.html" %}
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

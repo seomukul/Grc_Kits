@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ product.meta_title|default:product.title }} – {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ product.meta_description|default:product.short_description }}{% endblock %}
+{% block og_title %}{{ product.title }}{% endblock %}
+{% block content %}
+<div class="container-page py-12">
+  <nav class="text-sm text-slate-500"><a href="{% url 'catalog:list' %}" class="hover:underline">Kits</a> / <a href="{{ product.category.get_absolute_url }}" class="hover:underline">{{ product.category.name }}</a></nav>
+
+  <div class="mt-6 grid gap-10 lg:grid-cols-[1fr_22rem]">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">{{ product.title }}</h1>
+      <p class="mt-3 text-lg text-slate-600">{{ product.short_description }}</p>
+      {% if product.review_count %}<p class="mt-2 text-sm text-amber-600">★ {{ product.avg_rating|floatformat:1 }} · {{ product.review_count }} review{{ product.review_count|pluralize }}</p>{% endif %}
+      <div class="mt-4 flex flex-wrap gap-2">
+        {% for fw in product.frameworks.all %}<span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">{{ fw.name }}</span>{% endfor %}
+      </div>
+
+      {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.title }}" class="mt-8 w-full rounded-2xl border border-slate-200">{% endif %}
+
+      <div class="prose prose-slate mt-8 max-w-none">{{ product.description|linebreaks }}</div>
+
+      {% if product.included_items %}
+      <h2 class="mt-10 text-xl font-semibold text-slate-900">What's included</h2>
+      <ul class="mt-4 space-y-2">
+        {% for item in product.included_items %}<li class="flex gap-2 text-slate-700"><span class="text-accent-600">✓</span>{{ item }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+
+      <section class="mt-14" x-data="{ open: false }">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-slate-900">Reviews</h2>
+          {% if user.is_authenticated %}<button type="button" class="btn-secondary" @click="open = !open">Write a review</button>{% endif %}
+        </div>
+        {% if user.is_authenticated %}
+        <div x-cloak x-show="open" x-transition class="mt-4">
+          {% include "reviews/_form.html" %}
+        </div>
+        {% endif %}
+        <div class="mt-6 space-y-4">
+          {% for r in reviews %}
+          <div class="card p-5">
+            <p class="text-sm text-amber-600">{% for _ in "x"|rjust:r.rating %}★{% endfor %}</p>
+            <p class="mt-1 font-semibold text-slate-900">{{ r.title }}</p>
+            <p class="mt-1 text-sm text-slate-600">{{ r.body|linebreaksbr }}</p>
+            <p class="mt-2 text-xs text-slate-400">{{ r.user.first_name|default:"Customer" }}{% if r.is_verified_purchase %} · Verified purchase{% endif %} · {{ r.created_at|date:"M Y" }}</p>
+          </div>
+          {% empty %}
+          <p class="text-sm text-slate-500">No reviews yet.</p>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+
+    <aside>
+      <div class="card sticky top-24 p-6">
+        <div class="flex items-baseline gap-2">
+          <span class="text-3xl font-bold text-slate-900">${{ product.price }}</span>
+          {% if product.compare_at_price %}<span class="text-slate-400 line-through">${{ product.compare_at_price }}</span>{% endif %}
+        </div>
+        <p class="mt-1 text-sm text-slate-500">One-time payment · Instant download</p>
+        <form method="post" action="{% url 'payments:create' product.slug %}" class="mt-6" x-data="{ loading: false }" @submit="loading = true">
+          {% csrf_token %}
+          <button class="btn-primary w-full" :disabled="loading">
+            <span x-show="!loading">Buy now</span>
+            <span x-cloak x-show="loading">Redirecting to checkout…</span>
+          </button>
+        </form>
+        <p class="mt-4 text-center text-xs text-slate-500">Secure payment via Stripe</p>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

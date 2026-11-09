@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Consulting services – {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="container-page py-12">
+  <h1 class="text-3xl font-bold text-slate-900">Consulting services</h1>
+  <p class="mt-2 max-w-2xl text-slate-600">Templates get you most of the way. Our GRC specialists can take you the rest.</p>
+  <div class="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {% for s in services %}
+    <a href="{{ s.get_absolute_url }}" class="card block p-6 hover:border-brand-300">
+      <h2 class="font-semibold text-slate-900">{{ s.title }}</h2>
+      <p class="mt-2 text-sm text-slate-600">{{ s.summary }}</p>
+      {% if s.starting_price %}<p class="mt-4 text-sm font-medium text-brand-700">From ${{ s.starting_price|floatformat:0 }}</p>{% endif %}
+    </a>
+    {% empty %}
+    <p class="text-slate-500">Services coming soon.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
