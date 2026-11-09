@@ -35,7 +35,7 @@ Status key: ✅ done in Sprint 0 · 🟡 partial · ⬜ not started
 | My Library | ✅ magic-link sign-in, files + orders + invoices |
 | Cart / Checkout | ✅ session cart, coupons, multi-item Stripe Checkout |
 | Legal: Privacy, Terms, Refund, License Terms | 🟡 License Terms + Refund drafted (need legal review); Privacy & Terms still placeholders |
-| Admin: Dashboard, Products, Orders, Customers, Coupons, Blog, Services, Settings | 🟡 Unfold CRUD only; no analytics, customers, coupons, settings |
+| Admin: Dashboard, Products, Orders, Customers, Coupons, Blog, Services, Settings | ✅ sales dashboard, customers, coupons, site settings |
 
 ## 3. Home page (sections toggleable + reorderable from admin)
 
@@ -88,12 +88,14 @@ Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DS
 
 ## 5. Admin analytics dashboard (most important admin feature)
 
-All ⬜. Period selector: Today / Daily / Weekly / Monthly / Yearly / Custom.
+✅ Built in Sprint 4 (admin home page). Period selector: Today / Last 7 days / Last 30 days / This month / Last 12 months / This year / Custom range; charts bucket by day, week or month automatically.
 Widgets: revenue + % change vs previous period · units & orders · AOV · **net revenue after Stripe fees & refunds** · revenue and units charts · top products (units, revenue) · sales by category/framework · **by country** · by source (coupon/affiliate) and traffic source · recent orders · refunds & disputes · new vs returning customers · funnel (visitors → views → checkout → purchase) · **CSV/Excel export for every table**.
 
 Data captured on every order (Sprint 2 ✅): amount, discount, currency, **Stripe fee** (balance transaction), refunds, buyer email/name, **country**, coupon, first-touch UTM/referrer.
 
-Management screens: Products (duplicate/archive/versions) · Orders (resend receipt / download link, refund) · **Customers** · Coupons & bundles · Reviews ✅ · Blog · Services · **Homepage** (slider, featured, section order) · **Settings** (site info, email templates, SEO defaults, legal text) · **Roles: Owner + Editor (blog only), 2FA**.
+Widget status: ✅ revenue + % change · ✅ units & orders · ✅ AOV · ✅ net revenue (fees, refunds) · ✅ revenue / units charts · ✅ top products (units, revenue) · ✅ by discipline / framework / license tier / coupon · ✅ by country (table) · ✅ by traffic source (UTM/referrer) · ✅ recent orders · ✅ refunds & disputes · ✅ new vs returning · 🟡 funnel (checkout started → paid; visitor/product-view steps need GA4, Sprint 5) · ✅ CSV export (summary, orders, products, countries, sources, customers).
+
+Management screens: ✅ Products (duplicate/archive/versions) · ✅ Orders (resend receipt / download link, refund, CSV) · ✅ **Customers** (guests included, purchase history, CSV) · ✅ Coupons & bundles · ✅ Reviews · 🟡 Blog (Sprint 5) · ✅ Services · ✅ **Homepage** · 🟡 **Settings** (site info, contact, social ✅; email templates / SEO defaults later) · ✅ **Roles: Owner + Editor (blog only), 2FA (authenticator app + backup codes)**.
 
 ## 6. Blog
 

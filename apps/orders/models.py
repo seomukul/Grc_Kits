@@ -102,3 +102,30 @@ class OrderItem(models.Model):
     @property
     def line_total(self):
         return self.gross - self.discount
+
+
+class Customer(models.Model):
+    """One row per buyer email (guests included). Kept in sync from orders; see refresh_customer()."""
+
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=150, blank=True)
+    country = models.CharField(max_length=2, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="customer_profiles"
+    )
+    orders_count = models.PositiveIntegerField(default=0)
+    total_spent = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    total_refunded = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    first_order_at = models.DateTimeField(null=True, blank=True)
+    last_order_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    is_subscriber = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-last_order_at"]
+
+    def __str__(self):
+        return self.email
+
+    @property
+    def orders(self):
+        return Order.objects.filter(email__iexact=self.email).exclude(status=Order.Status.PENDING)

@@ -11,6 +11,7 @@ from apps.pages.sitemaps import StaticViewSitemap
 sitemaps = {"static": StaticViewSitemap, "products": ProductSitemap, "blog": PostSitemap}
 
 urlpatterns = [
+    path("admin/2fa/", include("apps.core.two_factor_urls")),
     path("admin/", admin.site.urls),
     path("account/", include("apps.core.account_urls")),
     path("accounts/", include("django.contrib.auth.urls")),

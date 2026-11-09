@@ -1,0 +1,93 @@
+{% extends 'admin/base.html' %}
+{% load i18n unfold %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% block branding %}{% include "unfold/helpers/site_branding.html" %}{% endblock %}
+
+{% block content %}
+{% if not analytics %}
+  {% include "unfold/helpers/dashboard_default.html" %}
+{% else %}
+<div style="display:flex;flex-direction:column;gap:1.5rem">
+
+  {# Period selector #}
+  <form method="get" style="display:flex;flex-wrap:wrap;align-items:center;gap:.5rem">
+    {% for key, label in presets %}{% if key != "custom" %}
+      <a href="?period={{ key }}" class="border rounded-default px-3 py-1.5 text-sm font-medium {% if period.key == key %}bg-primary-600 border-primary-600 text-white{% else %}bg-white border-base-200 text-font-default-light hover:border-base-300 dark:bg-base-900 dark:border-base-700{% endif %}">{{ label }}</a>
+    {% endif %}{% endfor %}
+    <span class="text-sm text-font-subtle-light" style="margin-left:.75rem">Custom:</span>
+    <input type="hidden" name="period" value="custom">
+    <input type="date" name="start" value="{{ period.start_date|date:'Y-m-d' }}" class="border border-base-200 rounded-default px-2 py-1 text-sm bg-white dark:bg-base-900 dark:border-base-700">
+    <span class="text-sm">–</span>
+    <input type="date" name="end" value="{{ period.end_date|date:'Y-m-d' }}" class="border border-base-200 rounded-default px-2 py-1 text-sm bg-white dark:bg-base-900 dark:border-base-700">
+    <button class="border border-base-200 rounded-default px-3 py-1.5 text-sm font-medium bg-white hover:border-base-300 dark:bg-base-900 dark:border-base-700">Apply</button>
+    <span style="margin-left:auto" class="text-sm text-font-subtle-light">{{ period.start_date|date:"M j, Y" }} – {{ period.end_date|date:"M j, Y" }}</span>
+    <a href="{{ export_links.summary }}" class="border border-base-200 rounded-default px-3 py-1.5 text-sm font-medium bg-white hover:border-base-300 dark:bg-base-900 dark:border-base-700">⬇ Summary CSV</a>
+    <a href="{{ export_links.orders }}" class="border border-base-200 rounded-default px-3 py-1.5 text-sm font-medium bg-white hover:border-base-300 dark:bg-base-900 dark:border-base-700">⬇ Orders CSV</a>
+  </form>
+
+  {# KPI cards #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem">
+    {% for k in kpi_cards %}
+      {% component "unfold/components/card.html" with size="md" %}
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <p class="text-sm text-font-subtle-light">{{ k.title }}</p>
+          <span class="material-symbols-outlined text-primary-600">{{ k.icon }}</span>
+        </div>
+        <p class="font-semibold text-important" style="font-size:1.6rem;margin-top:.25rem">{{ k.value }}</p>
+        {% if k.change %}<p class="text-xs" style="margin-top:.25rem;color:{% if k.change.up %}#059669{% else %}#dc2626{% endif %}">{{ k.change.value }} vs previous period</p>
+        {% else %}<p class="text-xs text-font-subtle-light" style="margin-top:.25rem">no previous data</p>{% endif %}
+        {% if k.note %}<p class="text-xs text-font-subtle-light">{{ k.note }}</p>{% endif %}
+      {% endcomponent %}
+    {% endfor %}
+  </div>
+
+  {# Charts #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:1rem">
+    {% component "unfold/components/card.html" with title="Revenue" description=period.label %}
+      {% component "unfold/components/chart/bar.html" with data=revenue_chart height=280 %}{% endcomponent %}
+    {% endcomponent %}
+    {% component "unfold/components/card.html" with title="Units & orders" description=period.label %}
+      {% component "unfold/components/chart/line.html" with data=units_chart height=280 %}{% endcomponent %}
+    {% endcomponent %}
+  </div>
+
+  {# Health row #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem">
+    {% component "unfold/components/card.html" with title="Customers" size="md" %}
+      <p class="text-sm"><strong class="text-important">{{ mix.new }}</strong> new · <strong class="text-important">{{ mix.returning }}</strong> returning</p>
+      {% if mix.total %}{% component "unfold/components/progress.html" with value=mix.new_pct title="New customers" %}{% endcomponent %}{% endif %}
+    {% endcomponent %}
+    {% component "unfold/components/card.html" with title="Checkout conversion" size="md" %}
+      <p class="text-sm"><strong class="text-important">{{ funnel.paid }}</strong> paid of <strong class="text-important">{{ funnel.started }}</strong> checkouts started{% if funnel.rate is not None %} · <strong class="text-important">{{ funnel.rate }}%</strong>{% endif %}</p>
+      <p class="text-xs text-font-subtle-light" style="margin-top:.5rem">Visitor and product-view steps come from Google Analytics (Sprint 5).</p>
+    {% endcomponent %}
+    {% component "unfold/components/card.html" with title="Refunds & disputes" size="md" %}
+      <p class="text-sm"><strong class="text-important">${{ totals.refunds|floatformat:2 }}</strong> refunded · <strong class="text-important">{{ totals.refunded_orders }}</strong> fully refunded orders</p>
+      <p class="text-sm" style="margin-top:.25rem"><strong class="text-important">{{ totals.disputed_orders }}</strong> open disputes · discounts given <strong class="text-important">${{ totals.discounts|floatformat:2 }}</strong></p>
+    {% endcomponent %}
+  </div>
+
+  {# Breakdown tables #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:1rem">
+    {% for title, link, table in tables %}
+      {% if link %}{% capture as action silent %}<a href="{{ link }}" class="text-sm text-primary-600 underline">CSV</a>{% endcapture %}{% endif %}
+      {% component "unfold/components/card.html" with title=title action=action %}
+        {% if table.rows %}{% component "unfold/components/table.html" with table=table card_included=1 striped=1 %}{% endcomponent %}
+        {% else %}<p class="text-sm text-font-subtle-light">No sales in this period.</p>{% endif %}
+      {% endcomponent %}
+    {% endfor %}
+  </div>
+
+  {% component "unfold/components/card.html" with title="Recent orders" %}
+    {% if recent.rows %}{% component "unfold/components/table.html" with table=recent card_included=1 striped=1 %}{% endcomponent %}
+    {% else %}<p class="text-sm text-font-subtle-light">No orders yet.</p>{% endif %}
+  {% endcomponent %}
+
+  <details>
+    <summary class="cursor-pointer text-sm font-medium">All apps</summary>
+    <div style="margin-top:1rem">{% include "unfold/helpers/dashboard_default.html" %}</div>
+  </details>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,15 +1,19 @@
+import csv
 import logging
 
 import stripe
 from django.contrib import admin, messages
 from django.db import transaction
+from django.http import HttpResponse
+from django.urls import reverse
+from django.utils.html import format_html, format_html_join
 from unfold.admin import ModelAdmin, TabularInline
 from unfold.decorators import action, display
 
 from apps.payments.stripe_client import get_client
 
 from .emails import send_order_confirmation
-from .models import Order, OrderItem
+from .models import Customer, Order, OrderItem
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +49,7 @@ class OrderAdmin(ModelAdmin):
     )
     inlines = [OrderItemInline]
     date_hierarchy = "created_at"
-    actions = ["resend_email", "refund"]
+    actions = ["resend_email", "refund", "export_csv"]
     actions_detail = ["resend_email_detail", "refund_detail"]
 
     @display(
@@ -90,6 +94,20 @@ class OrderAdmin(ModelAdmin):
                 order.save(update_fields=["status", "refunded_amount"])
             messages.success(request, f"{order} refunded. Downloads are now disabled.")
 
+    @action(description="Export selected orders to CSV")
+    def export_csv(self, request, queryset):
+        response = HttpResponse(content_type="text/csv; charset=utf-8")
+        response["Content-Disposition"] = 'attachment; filename="grckits-orders.csv"'
+        response.write("\ufeff")
+        w = csv.writer(response)
+        w.writerow(["Order", "Created", "Paid", "Status", "Email", "Country", "Items", "Subtotal", "Discount",
+                    "Total", "Stripe fee", "Refunded", "Net", "Coupon", "UTM source"])
+        for o in queryset.prefetch_related("items"):
+            w.writerow([o.short_number, o.created_at, o.paid_at, o.get_status_display(), o.email, o.country,
+                        "; ".join(i.product_title for i in o.items.all()), o.subtotal, o.discount_total, o.total,
+                        o.stripe_fee, o.refunded_amount, o.net_revenue, o.coupon_code, o.utm_source])
+        return response
+
     @action(description="Resend receipt + download links")
     def resend_email(self, request, queryset):
         self._resend(request, queryset)
@@ -111,3 +129,55 @@ class OrderAdmin(ModelAdmin):
 
         self._refund(request, Order.objects.filter(pk=object_id))
         return redirect("admin:orders_order_change", object_id)
+
+
+@admin.register(Customer)
+class CustomerAdmin(ModelAdmin):
+    list_display = ("email", "name", "country", "orders_count", "spent", "last_order_at", "account", "is_subscriber")
+    list_filter = ("country", "is_subscriber", ("user", admin.EmptyFieldListFilter))
+    search_fields = ("email", "name")
+    ordering = ("-last_order_at",)
+    readonly_fields = (
+        "email", "name", "country", "user", "orders_count", "total_spent", "total_refunded",
+        "first_order_at", "last_order_at", "is_subscriber", "order_history",
+    )
+    actions = ["export_csv"]
+
+    def has_add_permission(self, request):
+        return False
+
+    @display(description="Spent", ordering="total_spent")
+    def spent(self, obj):
+        return f"${obj.total_spent}"
+
+    @display(description="Account", boolean=True)
+    def account(self, obj):
+        return obj.user_id is not None
+
+    @display(description="Orders")
+    def order_history(self, obj):
+        rows = [
+            (reverse("admin:orders_order_change", args=[o.pk]), o.short_number,
+             o.paid_at.strftime("%Y-%m-%d") if o.paid_at else "–", o.get_status_display(), o.total,
+             ", ".join(i.product_title for i in o.items.all()))
+            for o in obj.orders.prefetch_related("items").order_by("-created_at")
+        ]
+        if not rows:
+            return "–"
+        return format_html(
+            "<table style=\"width:100%\">{}</table>",
+            format_html_join("", '<tr><td><a class="text-primary-600 underline" href="{}">{}</a></td><td>{}</td>'
+                                 "<td>{}</td><td>${}</td><td>{}</td></tr>", rows),
+        )
+
+    @action(description="Export selected customers to CSV")
+    def export_csv(self, request, queryset):
+        response = HttpResponse(content_type="text/csv; charset=utf-8")
+        response["Content-Disposition"] = 'attachment; filename="grckits-customers.csv"'
+        response.write("\ufeff")
+        w = csv.writer(response)
+        w.writerow(["Email", "Name", "Country", "Orders", "Spent", "Refunded", "First order", "Last order", "Subscriber"])
+        for c in queryset:
+            w.writerow([c.email, c.name, c.country, c.orders_count, c.total_spent, c.total_refunded,
+                        c.first_order_at, c.last_order_at, c.is_subscriber])
+        return response

@@ -1,0 +1,8 @@
+{% extends "admin/2fa/_layout.html" %}
+{% block card %}
+<p class="text-sm text-font-subtle-light" style="margin-top:.5rem">Two-factor authentication is on. Store these one-time backup codes somewhere safe (a password manager). Each works once if you lose your phone. They won't be shown again.</p>
+<ul style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:1.5rem 0;font-family:monospace;font-size:1rem">
+  {% for c in codes %}<li class="border border-base-200 rounded-default px-3 py-2 dark:border-base-700" style="text-align:center">{{ c }}</li>{% endfor %}
+</ul>
+<a href="{{ next }}" class="bg-primary-600 text-white rounded-default px-4 py-2 font-semibold" style="display:block;text-align:center">I've saved them, continue</a>
+{% endblock %}

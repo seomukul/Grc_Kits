@@ -5,7 +5,13 @@ from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from unfold.admin import ModelAdmin
 from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 
+from django.contrib import messages
+from django_otp import devices_for_user
+from django_otp.plugins.otp_totp.models import TOTPDevice
+from unfold.decorators import action, display
+
 from .models import User
+from .roles import EDITOR, ensure_roles
 
 admin.site.unregister(Group)
 
@@ -15,7 +21,36 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
-    list_display = ("email", "username", "company", "is_staff", "date_joined")
+    list_display = ("email", "username", "company", "is_staff", "role", "two_factor", "date_joined")
+    actions = ["make_editor", "reset_two_factor"]
+
+    @display(description="Role")
+    def role(self, obj):
+        if obj.is_superuser:
+            return "Owner"
+        if obj.groups.filter(name=EDITOR).exists():
+            return "Editor"
+        return "Staff" if obj.is_staff else "Customer"
+
+    @display(description="2FA", boolean=True)
+    def two_factor(self, obj):
+        return TOTPDevice.objects.filter(user=obj, confirmed=True).exists() if obj.is_staff else None
+
+    @action(description="Make Editor (blog only staff access)")
+    def make_editor(self, request, queryset):
+        group = ensure_roles()
+        for user in queryset.filter(is_superuser=False):
+            user.is_staff = True
+            user.save(update_fields=["is_staff"])
+            user.groups.add(group)
+        messages.success(request, "Selected users can now sign in to the admin and manage the blog.")
+
+    @action(description="Reset two-factor (user sets it up again at next login)")
+    def reset_two_factor(self, request, queryset):
+        for user in queryset:
+            for device in devices_for_user(user, confirmed=None):
+                device.delete()
+        messages.success(request, f"Two-factor reset for {queryset.count()} user(s).")
     search_fields = ("email", "username", "company")
     fieldsets = BaseUserAdmin.fieldsets + (("GRCkits", {"fields": ("company", "stripe_customer_id")}),)
     add_fieldsets = (

@@ -1,0 +1,7 @@
+{% extends "admin/2fa/_layout.html" %}
+{% block card %}
+<p class="text-sm text-font-subtle-light" style="margin-top:.5rem">Admin access is protected with an authenticator app. Scan this QR code with Google Authenticator, Microsoft Authenticator, 1Password or similar, then enter the 6-digit code it shows.</p>
+<div style="display:flex;justify-content:center;margin:1.5rem 0"><img src="{{ qr }}" alt="QR code for your authenticator app" width="200" height="200" style="background:#fff;padding:.5rem;border-radius:.5rem"></div>
+<p class="text-xs text-font-subtle-light" style="text-align:center">Can't scan? Enter this key manually:<br><code style="font-size:.85rem;letter-spacing:.08em">{{ secret }}</code></p>
+{% include "admin/2fa/_token_form.html" with button="Turn on two-factor" %}
+{% endblock %}

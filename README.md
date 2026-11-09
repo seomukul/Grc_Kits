@@ -156,6 +156,14 @@ An editorial, "auditor-grade" look: midnight navy, gold and warm paper, with ser
 - **Alpine:** use it for small client-side state (mobile nav, toggles, button loading states). Put shared state in `Alpine.store("ui")`.
 - HTMX and Alpine load from unpkg with pinned versions. Before launch, consider vendoring them into `assets/js/vendor/`, or add SRI hashes.
 
+## Admin: sales dashboard, customers, roles, 2FA
+
+- **Sales dashboard** (admin home page): KPIs with % change vs the previous period; revenue, units and orders charts; breakdowns by product, discipline, framework, license, coupon, country and traffic source; new vs returning customers; checkout conversion; refunds and disputes; recent orders. Pick Today, 7 days, 30 days, this month, 12 months, this year or a custom range. Every table can be downloaded as CSV (UTF-8 with BOM, so Excel opens it correctly).
+- **Customers:** one row per buyer email, guests included, kept in sync automatically when orders are paid or refunded. To rebuild the table run `python manage.py rebuild_customers`.
+- **Roles:** an *Owner* is a superuser. An *Editor* is staff in the `Editor` group and can only use the blog. Make someone an Editor with Admin → Users → *Make Editor*. The sidebar only shows what each person can access.
+- **Two-factor authentication:** when `ADMIN_2FA_REQUIRED=True` (the production default), every staff member scans a QR code with an authenticator app at first login and gets 8 one-time backup codes. If someone loses their phone, use Admin → Users → *Reset two-factor*. In local dev it's off unless you set it in `.env`.
+- **Demo data for the dashboard (dev only):** `python manage.py seed_sales` creates 150 fake orders.
+
 ## Deployment notes
 
 ```bash
@@ -211,6 +219,15 @@ gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
 - [x] About Me, Contact, License Terms and Refund Policy drafts
 - [x] Site settings: contact, socials, booking link, lead magnet; welcome email
 - [x] Product FAQs, footer social icons, header About/Contact links
+
+## Sprint 4: done
+
+- [x] Admin sales dashboard with period selector, KPIs, charts and breakdowns
+- [x] CSV exports (summary, orders, products, countries, sources, customers)
+- [x] Customers table (guests included) with purchase history
+- [x] Editor role (blog only) and permission-aware admin sidebar
+- [x] Staff two-factor authentication (TOTP + backup codes)
+- [x] Admin themed in GRCkits gold
 
 ## Next sprints (suggested)
 

@@ -52,6 +52,9 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "django_otp",
+    "django_otp.plugins.otp_totp",
+    "django_otp.plugins.otp_static",
     "django_htmx",
     "django_tailwind_cli",
 ]
@@ -79,6 +82,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
+    "apps.core.two_factor.StaffTwoFactorMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
@@ -131,6 +136,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+# Staff must use an authenticator app (TOTP) to reach the admin. Turn off only for local dev.
+ADMIN_2FA_REQUIRED = env.bool("ADMIN_2FA_REQUIRED", default=True)
+OTP_TOTP_ISSUER = "GRCkits Admin"
 
 # ---------------------------------------------------------------------------
 # I18N
@@ -245,21 +254,14 @@ UNFOLD = {
     "SITE_SUBHEADER": "Store & content management",
     "SITE_URL": "/",
     "SITE_SYMBOL": "shield_lock",
+    "DASHBOARD_CALLBACK": "apps.dashboard.admin_dashboard.dashboard_callback",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "COLORS": {
+        # Gold, matching the storefront design (frontend/tailwind.css).
         "primary": {
-            "50": "oklch(97.7% .014 308.299)",
-            "100": "oklch(94.6% .033 307.174)",
-            "200": "oklch(90.2% .063 306.703)",
-            "300": "oklch(82.7% .119 306.383)",
-            "400": "oklch(71.4% .203 305.504)",
-            "500": "oklch(62.7% .265 303.9)",
-            "600": "oklch(55.8% .288 302.321)",
-            "700": "oklch(49.6% .265 301.924)",
-            "800": "oklch(43.8% .218 303.724)",
-            "900": "oklch(38.1% .176 304.987)",
-            "950": "oklch(29.1% .149 302.717)",
+            "50": "#fbf7ee", "100": "#f5ecd6", "200": "#ebd9ae", "300": "#e6cb86", "400": "#d6b467",
+            "500": "#c29b4c", "600": "#a8823a", "700": "#8a6a2e", "800": "#6b5226", "900": "#4d3b1c", "950": "#2e2311",
         },
     },
     "SIDEBAR": {
@@ -270,10 +272,12 @@ UNFOLD = {
                 "title": _("Store"),
                 "separator": True,
                 "items": [
+                    {"title": _("Sales dashboard"), "icon": "monitoring", "link": reverse_lazy("admin:index")},
                     {"title": _("Products"), "icon": "inventory_2", "link": reverse_lazy("admin:catalog_product_changelist")},
                     {"title": _("Categories"), "icon": "category", "link": reverse_lazy("admin:catalog_category_changelist")},
                     {"title": _("Frameworks"), "icon": "verified", "link": reverse_lazy("admin:catalog_framework_changelist")},
                     {"title": _("Orders"), "icon": "receipt_long", "link": reverse_lazy("admin:orders_order_changelist")},
+                    {"title": _("Customers"), "icon": "group", "link": reverse_lazy("admin:orders_customer_changelist")},
                     {"title": _("Coupons"), "icon": "sell", "link": reverse_lazy("admin:marketing_coupon_changelist")},
                     {"title": _("Download files"), "icon": "folder_zip", "link": reverse_lazy("admin:downloads_productfile_changelist")},
                     {"title": _("Reviews"), "icon": "reviews", "link": reverse_lazy("admin:reviews_review_changelist")},
@@ -308,3 +312,22 @@ UNFOLD = {
         ],
     },
 }
+
+
+def _guard_sidebar(navigation):
+    """Show each sidebar link only to users with view permission on its model (e.g. Editors see the blog only)."""
+    for group in navigation:
+        for item in group["items"]:
+            url_name = str(item["link"]._args[0]) if hasattr(item["link"], "_args") else ""
+            # admin:<app>_<model>_changelist -> <app>.view_<model>
+            if url_name.startswith("admin:") and url_name.endswith("_changelist"):
+                app_model = url_name[len("admin:"):-len("_changelist")]
+                app, _, model = app_model.partition("_")
+                perm = f"{app}.view_{model}"
+                item["permission"] = lambda request, perm=perm: request.user.has_perm(perm)
+            elif url_name == "admin:index":
+                item["permission"] = lambda request: request.user.has_perm("orders.view_order")
+    return navigation
+
+
+_guard_sidebar(UNFOLD["SIDEBAR"]["navigation"])

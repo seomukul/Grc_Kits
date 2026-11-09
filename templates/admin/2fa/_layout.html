@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+{% block branding %}{% include "unfold/helpers/site_branding.html" %}{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+{% block content %}
+<div style="max-width:30rem;margin:2rem auto" class="bg-white border border-base-200 rounded-default p-8 dark:bg-base-900 dark:border-base-800">
+  <h1 class="font-semibold text-important" style="font-size:1.25rem">{{ title }}</h1>
+  {% block card %}{% endblock %}
+</div>
+{% endblock %}

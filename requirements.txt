@@ -11,6 +11,10 @@ django-htmx>=1.19
 # Admin
 django-unfold>=0.50
 
+# Security (admin two-factor auth)
+django-otp>=1.5
+qrcode>=7.4
+
 # Payments
 stripe>=11.0
 

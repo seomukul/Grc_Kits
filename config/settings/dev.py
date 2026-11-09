@@ -5,6 +5,7 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", ".localhost"]
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+ADMIN_2FA_REQUIRED = env.bool("ADMIN_2FA_REQUIRED", default=False)
 
 # django-debug-toolbar (optional: only if installed from requirements-dev.txt)
 try:

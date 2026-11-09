@@ -1,0 +1,7 @@
+<form method="post" style="margin-top:1.5rem;display:flex;flex-direction:column;gap:.75rem">
+  {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+  <label for="id_token" class="font-semibold text-sm">{{ form.token.label }}</label>
+  <input id="id_token" name="token" {% for k, v in form.token.field.widget.attrs.items %}{{ k }}="{{ v }}" {% endfor %} class="border border-base-200 rounded-default px-3 py-2 text-lg tracking-widest bg-white dark:bg-base-900 dark:border-base-700" required>
+  {% for e in form.token.errors %}<p class="text-sm" style="color:#dc2626">{{ e }}</p>{% endfor %}
+  <button class="bg-primary-600 text-white rounded-default px-4 py-2 font-semibold">{{ button|default:"Verify" }}</button>
+</form>

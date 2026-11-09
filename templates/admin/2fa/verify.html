@@ -1,0 +1,6 @@
+{% extends "admin/2fa/_layout.html" %}
+{% block card %}
+<p class="text-sm text-font-subtle-light" style="margin-top:.5rem">Enter the 6-digit code from your authenticator app. Lost your phone? Use one of your backup codes.</p>
+{% include "admin/2fa/_token_form.html" %}
+<form method="post" action="{% url 'admin:logout' %}" style="margin-top:1rem">{% csrf_token %}<button class="text-sm underline text-font-subtle-light">Sign out</button></form>
+{% endblock %}
