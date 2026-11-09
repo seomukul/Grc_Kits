@@ -98,9 +98,21 @@ With R2 enabled:
 - **Files and versions:** every product has one or more *files*. Open a file to upload new *versions* with a changelog. Buyers always get the latest version. The "Email buyers about latest version" action sends each buyer a fresh link.
 - **Site settings** (admin): download limit per file (default 5), link lifetime (default 24 h), tier multipliers, and the thresholds for the New and Bestseller badges.
 
+## Cart, coupons and accounts
+
+- **Cart:** the cart lives in the session, one line per product (choosing another license replaces the line). The checkout form collects the buyer's email and name and requires them to accept the License Terms.
+- **Coupons** (Admin → Coupons): percent or fixed discount; sitewide or limited to chosen products; minimum order; start and end dates; limits on total uses and uses per customer. Only *paid* orders count as uses. Our code calculates the discount and stores each line's share. Stripe Checkout then shows it as a one-off Stripe coupon for exactly that amount. If a coupon brings the total to $0, the order is completed without Stripe.
+- **Invoices:** when *Site settings → Stripe invoices* is on, Stripe creates a PDF invoice for every order (Stripe charges a small invoicing fee). The link appears in the email, in My Library and on the order page.
+- **My Library:** customers sign in at `/account/login/` with a one-time email link that's valid for 20 minutes; there's no password. A buyer's first sign-in creates their account and links all their guest orders to it. Staff still use `/admin/` with a password.
+- **Admin order actions:** *Refund in Stripe* (refunds and disables downloads) and *Resend receipt + download links*.
+- **Reports data:** each order stores the Stripe fee, refunds, country and first-touch UTM/referrer. Sprint 4's dashboard uses these.
+- **Wallets:** Apple Pay, Google Pay and Link need no code. Turn them on in Stripe Dashboard → Settings → Payment methods, and verify the domain for Apple Pay.
+
+Stripe webhook events to enable: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`, `charge.dispute.created`, `charge.dispute.closed`.
+
 ## How purchase and delivery work
 
-1. **Buy now** (`POST /checkout/<slug>/`) creates a `pending` Order and redirects to Stripe-hosted Checkout. The price comes from the database through `price_data`, so you don't have to create Stripe Price objects.
+1. **Checkout** (`POST /checkout/` from the cart) re-checks the cart and coupon, creates a `pending` Order and redirects to Stripe-hosted Checkout. Prices come from the database through `price_data`, so you don't have to create Stripe Price objects.
 2. Stripe sends `checkout.session.completed` to `/checkout/webhook/stripe/`. The webhook:
    - verifies the signature;
    - stores the event in `StripeEvent` (its unique `event_id` makes retries harmless);
@@ -109,9 +121,9 @@ With R2 enabled:
 3. Buyers download through **signed links** (`/downloads/<signed>/`) that expire after the *link lifetime* (24 h by default). A file can be downloaded until the per-file limit is reached, and every download is recorded in `DownloadLog`. A refunded order or a revoked entitlement blocks downloads immediately. Logged-in customers get fresh links from `/dashboard/`.
 4. The success page never fulfils anything. It only polls with HTMX until the webhook has marked the order paid.
 
-The webhook also handles these events: `async_payment_succeeded`, `async_payment_failed`, `session.expired` and `charge.refunded`.
 
-Guest checkout works. Logged-in buyers also see their purchases at `/dashboard/`.
+
+Guest checkout works. Buyers find past purchases in My Library (`/dashboard/`) after signing in with the email link.
 
 ## Frontend conventions
 
@@ -156,6 +168,16 @@ gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
 - [x] Cloudflare R2 private storage with direct browser uploads
 - [x] Shop filters (framework, type, price, rating), sorting, New/Bestseller/Sale badges, related products
 - [x] Verified-buyer-only reviews, download buttons on the confirmation page
+
+## Sprint 2: done
+
+- [x] Session cart (HTMX), "customers also bought"
+- [x] Own coupon system (percent/fixed, product scope, limits) applied in Stripe Checkout
+- [x] Multi-item Stripe Checkout, license acceptance, Stripe invoices, free-order path
+- [x] Webhook: Stripe fee, country, buyer name, invoice URL, partial/full refunds, disputes
+- [x] Magic-link sign-in to My Library, guest orders linked by email
+- [x] Admin: Refund in Stripe, Resend receipt, Coupons
+- [x] First-touch UTM/referrer attribution on orders
 
 ## Next sprints (suggested)
 

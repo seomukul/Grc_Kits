@@ -82,6 +82,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
+    "apps.core.middleware.AttributionMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -100,6 +101,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "apps.core.context_processors.site",
                 "apps.pages.context_processors.footer_pages",
+                "apps.orders.context_processors.cart",
             ],
         },
     },
@@ -119,7 +121,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Auth
 # ---------------------------------------------------------------------------
 AUTH_USER_MODEL = "core.User"
-LOGIN_URL = "login"
+LOGIN_URL = "account:login"
 LOGIN_REDIRECT_URL = "dashboard:home"
 LOGOUT_REDIRECT_URL = "pages:home"
 
@@ -272,6 +274,7 @@ UNFOLD = {
                     {"title": _("Categories"), "icon": "category", "link": reverse_lazy("admin:catalog_category_changelist")},
                     {"title": _("Frameworks"), "icon": "verified", "link": reverse_lazy("admin:catalog_framework_changelist")},
                     {"title": _("Orders"), "icon": "receipt_long", "link": reverse_lazy("admin:orders_order_changelist")},
+                    {"title": _("Coupons"), "icon": "sell", "link": reverse_lazy("admin:marketing_coupon_changelist")},
                     {"title": _("Download files"), "icon": "folder_zip", "link": reverse_lazy("admin:downloads_productfile_changelist")},
                     {"title": _("Reviews"), "icon": "reviews", "link": reverse_lazy("admin:reviews_review_changelist")},
                 ],

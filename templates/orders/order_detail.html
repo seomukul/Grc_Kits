@@ -2,7 +2,7 @@
 {% block title %}Order {{ order.short_number }} – {{ SITE_NAME }}{% endblock %}
 {% block content %}
 <div class="container-page max-w-3xl py-12">
-  <a href="{% url 'dashboard:home' %}" class="text-sm text-brand-600 hover:underline">&larr; My account</a>
+  <a href="{% url 'dashboard:home' %}" class="text-sm text-brand-600 hover:underline">&larr; My Library</a>
   <h1 class="mt-4 text-2xl font-bold text-slate-900">Order {{ order.short_number }}</h1>
   <p class="text-sm text-slate-500">{{ order.created_at|date:"M j, Y" }} · {{ order.get_status_display }}</p>
   <div class="card mt-6 divide-y divide-slate-100">
@@ -12,10 +12,14 @@
         <p class="font-medium text-slate-900">{{ item.product_title }} <span class="text-sm font-normal text-slate-500">· {{ item.license_label }} license</span></p>
         {% if order.status == "paid" %}{% for ent in item.entitlements.all %}<a href="{{ ent.get_absolute_url }}" class="block text-sm text-brand-600 hover:underline">Download {{ ent.product.title }}</a>{% endfor %}{% endif %}
       </div>
-      <p class="font-medium">${{ item.line_total }}</p>
+      <p class="font-medium">{% if item.discount %}<span class="mr-2 text-sm text-slate-400 line-through">${{ item.gross }}</span>{% endif %}${{ item.line_total }}</p>
     </div>
     {% endfor %}
+    {% if order.discount_total %}<div class="flex justify-between p-4 text-sm text-emerald-700"><span>Coupon {{ order.coupon_code }}</span><span>−${{ order.discount_total }}</span></div>{% endif %}
     <div class="flex justify-between p-4 font-semibold"><span>Total</span><span>${{ order.total }} {{ order.currency|upper }}</span></div>
+  </div>
+  {% if order.invoice_url %}<a href="{{ order.invoice_url }}" target="_blank" rel="noopener" class="btn-secondary mt-4">Download invoice (PDF)</a>{% endif %}
+  <div>
   </div>
 </div>
 {% endblock %}

@@ -32,8 +32,8 @@ Status key: ✅ done in Sprint 0 · 🟡 partial · ⬜ not started
 | Blog → Category → Post | 🟡 posts only, no blog categories |
 | About Me | 🟡 generic CMS page; needs bio/certs/photo layout |
 | Contact Us | ⬜ form with spam protection |
-| My Library | 🟡 dashboard exists but needs password login; brief wants magic link |
-| Cart / Checkout | 🟡 single-product "Buy now" only |
+| My Library | ✅ magic-link sign-in, files + orders + invoices |
+| Cart / Checkout | ✅ session cart, coupons, multi-item Stripe Checkout |
 | Legal: Privacy, Terms, Refund, License Terms | 🟡 CMS pages exist (seeded), License Terms missing |
 | Admin: Dashboard, Products, Orders, Customers, Coupons, Blog, Services, Settings | 🟡 Unfold CRUD only; no analytics, customers, coupons, settings |
 
@@ -64,23 +64,23 @@ Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DS
 - 🟡 Detail page: price, buy, description, included, reviews, gallery, preview, related products ✅ · FAQ ⬜
 - ✅ Reviews: moderation · **verified buyers only**
 - ✅ Bundles (discounted packs, framework "Complete Toolkit")
-- 🟡 Coupons: Stripe promotion codes allowed at checkout · ⬜ own Coupon model (percent/fixed, expiry, usage limit, per-product or sitewide)
+- ✅ Coupons: own Coupon model (percent/fixed, expiry, total + per-customer limits, minimum order, per-product or sitewide)
 - ⬜ Wishlist (optional) · ⬜ Recently viewed
 
 ### 4.3 Purchase & delivery
 - ✅ Guest checkout (name + email only)
 - ✅ Instant delivery: email link · download button on confirmation page
 - ✅ Secure downloads: files never public · download limit 5 per file (Site settings) · **signed links valid 24 h** · download log
-- ⬜ My Library via **magic link / one-time code** (no password)
-- ⬜ Receipt / invoice PDF with order number (Stripe Checkout `invoice_creation` can do this)
-- 🟡 Refund disables downloads ✅ (via `charge.refunded`) · admin "mark refunded" action ⬜ · disputes ⬜
-- ⬜ Apple Pay / Google Pay / Link (enable in Stripe Dashboard; Checkout shows them automatically)
+- ✅ My Library via **magic link** (no password); guest orders are linked to the account by email
+- ✅ Receipt email + Stripe invoice PDF with order number (toggle in Site settings)
+- ✅ Refunds (full disables downloads, partial tracked) · admin "Refund in Stripe" + "Resend receipt" actions · disputes (blocks downloads, restores if won, emails admin)
+- 🟡 Apple Pay / Google Pay / Link: code ready (dynamic payment methods); owner turns them on in Stripe Dashboard → Payment methods
 - ~~Stripe Tax~~ (owner decision: not used)
 
 ### 4.4 Marketing
 - 🟡 Email list ✅ · welcome email ⬜ · export / Mailchimp-MailerLite-Brevo sync ⬜
 - ⬜ Free lead magnet per category (sample template for email)
-- ⬜ Abandoned cart email · ⬜ upsell/cross-sell "customers also bought"
+- ⬜ Abandoned cart email · ✅ "customers also bought" on cart page
 - 🟡 Open Graph tags ✅ · share buttons ⬜
 - ⬜ Affiliate program (later)
 
@@ -89,7 +89,7 @@ Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DS
 All ⬜. Period selector: Today / Daily / Weekly / Monthly / Yearly / Custom.
 Widgets: revenue + % change vs previous period · units & orders · AOV · **net revenue after Stripe fees & refunds** · revenue and units charts · top products (units, revenue) · sales by category/framework · **by country** · by source (coupon/affiliate) and traffic source · recent orders · refunds & disputes · new vs returning customers · funnel (visitors → views → checkout → purchase) · **CSV/Excel export for every table**.
 
-Data we must capture on every order (from Stripe): amount, currency, **Stripe fee** (balance transaction), buyer email, **country**, coupon, UTM/referrer.
+Data captured on every order (Sprint 2 ✅): amount, discount, currency, **Stripe fee** (balance transaction), refunds, buyer email/name, **country**, coupon, first-touch UTM/referrer.
 
 Management screens: Products (duplicate/archive/versions) · Orders (resend receipt / download link, refund) · **Customers** · Coupons & bundles · Reviews ✅ · Blog · Services · **Homepage** (slider, featured, section order) · **Settings** (site info, email templates, SEO defaults, legal text) · **Roles: Owner + Editor (blog only), 2FA**.
 

@@ -1,0 +1,78 @@
+<div id="cart-body" class="mt-8">
+{% if lines %}
+  <div class="grid gap-10 lg:grid-cols-[1fr_24rem]">
+    <div>
+      <ul class="card divide-y divide-slate-100">
+        {% for line in lines %}
+        <li class="flex items-center gap-4 p-4">
+          {% if line.product.image %}<img src="{{ line.product.image.url }}" alt="" class="size-16 rounded-lg object-cover">{% else %}<div class="grid size-16 place-items-center rounded-lg bg-brand-50 text-xl font-bold text-brand-300">{{ line.product.title|first }}</div>{% endif %}
+          <div class="min-w-0 flex-1">
+            <a href="{{ line.product.get_absolute_url }}" class="font-medium text-slate-900 hover:text-brand-700">{{ line.product.title }}</a>
+            <p class="text-sm text-slate-500">{{ line.tier_label }} license · {{ line.product.get_product_type_display }}</p>
+          </div>
+          <div class="text-right">
+            {% if line.discount %}<p class="text-sm text-slate-400 line-through">${{ line.price }}</p><p class="font-semibold text-emerald-700">${{ line.total }}</p>{% else %}<p class="font-semibold">${{ line.price }}</p>{% endif %}
+          </div>
+          <form hx-post="{% url 'orders:cart_remove' line.product.pk %}" hx-target="#cart-body" hx-swap="outerHTML" method="post" action="{% url 'orders:cart_remove' line.product.pk %}">
+            {% csrf_token %}<button class="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-red-600" aria-label="Remove {{ line.product.title }}">✕</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+
+      {% if also_bought %}
+      <section class="mt-12">
+        <h2 class="text-lg font-semibold text-slate-900">Customers also bought</h2>
+        <div class="mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">{% for product in also_bought %}{% include "catalog/_product_card.html" %}{% endfor %}</div>
+      </section>
+      {% endif %}
+    </div>
+
+    <aside class="space-y-4">
+      <div class="card p-6">
+        <form hx-post="{% url 'orders:cart_coupon' %}" hx-target="#cart-body" hx-swap="outerHTML" method="post" action="{% url 'orders:cart_coupon' %}">
+          {% csrf_token %}
+          {% if cart.coupon %}
+            <div class="flex items-center justify-between rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+              <span><strong>{{ cart.coupon.code }}</strong> · {{ cart.coupon.label }}</span>
+              <button name="remove" value="1" class="text-emerald-700 underline">Remove</button>
+            </div>
+          {% else %}
+            <label for="coupon-code">Coupon code</label>
+            <div class="flex gap-2"><input id="coupon-code" name="code" autocomplete="off" class="uppercase"><button class="btn-secondary shrink-0">Apply</button></div>
+            {% if coupon_error %}<p class="errorlist">{{ coupon_error }}</p>{% endif %}
+          {% endif %}
+        </form>
+
+        <dl class="mt-6 space-y-2 text-sm">
+          <div class="flex justify-between"><dt class="text-slate-600">Subtotal</dt><dd>${{ totals.subtotal }}</dd></div>
+          {% if totals.discount %}<div class="flex justify-between text-emerald-700"><dt>Discount</dt><dd>−${{ totals.discount }}</dd></div>{% endif %}
+          <div class="flex justify-between border-t border-slate-100 pt-2 text-base font-semibold"><dt>Total</dt><dd>${{ totals.total }} USD</dd></div>
+        </dl>
+      </div>
+
+      <form method="post" action="{% url 'payments:checkout' %}" class="card space-y-4 p-6" x-data="{ loading: false }" @submit="loading = true">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="errorlist">{{ form.non_field_errors }}</div>{% endif %}
+        <div><label for="{{ form.email.id_for_label }}">Email</label>{{ form.email }}<p class="mt-1 text-xs text-slate-500">{{ form.email.help_text }}</p>{{ form.email.errors }}</div>
+        <div><label for="{{ form.name.id_for_label }}">{{ form.name.label }} <span class="font-normal text-slate-400">(optional)</span></label>{{ form.name }}</div>
+        <label class="flex items-start gap-2 text-sm font-normal text-slate-600">
+          {{ form.accept_license }}
+          <span>I agree to the <a href="/license/" target="_blank" class="underline">License Terms</a> and <a href="/refunds/" target="_blank" class="underline">Refund Policy</a></span>
+        </label>
+        {{ form.accept_license.errors }}
+        <button class="btn-primary w-full" :disabled="loading">
+          <span x-show="!loading">Checkout · ${{ totals.total }}</span>
+          <span x-cloak x-show="loading">Redirecting to secure checkout…</span>
+        </button>
+        <p class="text-center text-xs text-slate-500">Card, Apple Pay & Google Pay via Stripe · Instant download</p>
+      </form>
+    </aside>
+  </div>
+{% else %}
+  <div class="card p-12 text-center">
+    <p class="text-slate-600">Your cart is empty.</p>
+    <a href="{% url 'catalog:list' %}" class="btn-primary mt-6">Browse kits</a>
+  </div>
+{% endif %}
+</div>

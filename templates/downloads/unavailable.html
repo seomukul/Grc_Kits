@@ -5,8 +5,8 @@
 <div class="container-page max-w-xl py-24 text-center">
   {% if reason == "expired" %}
     <h1 class="text-2xl font-bold text-slate-900">This download link has expired</h1>
-    <p class="mt-3 text-slate-600">For security, download links only work for a limited time. Log in to your account to get a fresh link.</p>
-    <a href="{% url 'dashboard:home' %}" class="btn-primary mt-8">Go to my downloads</a>
+    <p class="mt-3 text-slate-600">For security, download links only work for a limited time. Sign in to My Library with your purchase email to get a fresh link. No password needed.</p>
+    <a href="{% url 'account:login' %}" class="btn-primary mt-8">Open My Library</a>
   {% elif reason == "limit" %}
     <h1 class="text-2xl font-bold text-slate-900">Download limit reached</h1>
     <p class="mt-3 text-slate-600">You've used all downloads for this file. Contact us and we'll help you out.</p>

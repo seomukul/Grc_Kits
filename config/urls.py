@@ -12,11 +12,12 @@ sitemaps = {"static": StaticViewSitemap, "products": ProductSitemap, "blog": Pos
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("account/", include("apps.core.account_urls")),
     path("accounts/", include("django.contrib.auth.urls")),
     path("", include("apps.core.urls")),
     path("kits/", include("apps.catalog.urls")),
     path("checkout/", include("apps.payments.urls")),
-    path("orders/", include("apps.orders.urls")),
+    path("", include("apps.orders.urls")),
     path("downloads/", include("apps.downloads.urls")),
     path("reviews/", include("apps.reviews.urls")),
     path("newsletter/", include("apps.marketing.urls")),

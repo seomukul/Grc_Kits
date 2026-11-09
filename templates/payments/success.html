@@ -23,7 +23,7 @@
   </div>
   {% endif %}
   <div class="mt-8 flex justify-center gap-3">
-    {% if user.is_authenticated %}<a href="{% url 'dashboard:home' %}" class="btn-primary">Go to my downloads</a>{% endif %}
+    <a href="{% url 'dashboard:home' %}" class="btn-primary">Open My Library</a>
     <a href="{% url 'catalog:list' %}" class="btn-secondary">Keep browsing</a>
   </div>
 </div>

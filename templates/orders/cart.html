@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Your cart – {{ SITE_NAME }}{% endblock %}
+{% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="container-page py-12">
+  <h1 class="text-3xl font-bold text-slate-900">Your cart</h1>
+  {% include "orders/_cart_body.html" %}
+</div>
+{% endblock %}

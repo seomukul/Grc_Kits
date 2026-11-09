@@ -1,13 +1,17 @@
 {% autoescape off %}Thanks for your purchase from {{ SITE_NAME }}!
 
 Order: {{ order.short_number }}
-{% for item in order.items.all %}- {{ item.product_title }} ({{ item.license_label }} license): ${{ item.line_total }}
-{% endfor %}Total: ${{ order.total }} {{ order.currency|upper }}
+{% for item in order.items.all %}- {{ item.product_title }} ({{ item.license_label }} license): ${{ item.gross }}
+{% endfor %}{% if order.discount_total %}Discount ({{ order.coupon_code }}): -${{ order.discount_total }}
+{% endif %}Total: ${{ order.total }} {{ order.currency|upper }}
+{% if order.invoice_url %}Invoice (PDF): {{ order.invoice_url }}
+{% endif %}
 
 Download your files (links valid for {{ ttl_hours }} hours):
 {% for ent in entitlements %}- {{ ent.product.title }}: {{ SITE_URL }}{{ ent.get_absolute_url }}
 {% endfor %}
-After that, log in to your account at {{ SITE_URL }}/dashboard/ to get fresh links at any time.
+After that, sign in to My Library with this email address to get fresh links at any time (no password needed):
+{{ SITE_URL }}/account/login/
 Your purchase includes free updates; we'll email you when a new version is out.
 
 – The {{ SITE_NAME }} team

@@ -39,6 +39,12 @@ class SiteSettings(models.Model):
         default=5, help_text="Units sold in the last 30 days for the 'Bestseller' badge."
     )
 
+    # Checkout
+    stripe_invoices = models.BooleanField(
+        default=True,
+        help_text="Have Stripe create a PDF invoice for every order (Stripe charges a small invoicing fee).",
+    )
+
     class Meta:
         verbose_name = verbose_name_plural = "site settings"
 

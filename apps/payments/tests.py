@@ -18,6 +18,7 @@ from apps.downloads.models import DownloadLog, Entitlement, ProductFile, Product
 from apps.downloads.notifications import notify_buyers_of_update
 from apps.orders.models import Order
 from apps.orders.services import create_order_for_product, mark_order_paid
+from apps.marketing.models import Coupon
 from apps.payments.models import StripeEvent
 
 TMP = tempfile.mkdtemp()
@@ -73,7 +74,8 @@ class CheckoutWebhookTests(BaseTestCase):
                     "payment_status": payment_status,
                     "client_reference_id": str(order.number),
                     "metadata": {"order_number": str(order.number)},
-                    "customer_details": {"email": "buyer@example.com"},
+                    "customer_details": {"email": "buyer@example.com", "name": "Ann", "address": {"country": "BD"}},
+                    "invoice": "in_1",
                     "payment_intent": "pi_123",
                 }
             },
@@ -83,46 +85,92 @@ class CheckoutWebhookTests(BaseTestCase):
         fake = mock.MagicMock()
         fake.__getitem__.side_effect = event.__getitem__
         fake.to_dict.return_value = event
-        with mock.patch("stripe.Webhook.construct_event", return_value=fake):
+        client = mock.MagicMock()
+        client.v1.payment_intents.retrieve.return_value.latest_charge.balance_transaction.fee = 462
+        client.v1.invoices.retrieve.return_value.invoice_pdf = "https://pay.stripe.com/invoice/x/pdf"
+        with mock.patch("stripe.Webhook.construct_event", return_value=fake), \
+                mock.patch("apps.payments.views.get_client", return_value=client):
             return self.client.post(
                 reverse("payments:stripe_webhook"), data=json.dumps(event),
                 content_type="application/json", HTTP_STRIPE_SIGNATURE="t=1,v1=x",
             )
 
-    def _checkout(self, **post):
+    def _checkout(self, tier="single", coupon=None, email="buyer@example.com", **extra):
+        self.client.post(reverse("orders:cart_add", args=[self.product.slug]), {"license": tier})
+        if coupon:
+            self.client.post(reverse("orders:cart_coupon"), {"code": coupon})
         session = mock.MagicMock(id="cs_test_1", url="https://checkout.stripe.com/c/pay/cs_test_1")
         with mock.patch("apps.payments.views.get_client") as gc:
             gc.return_value.v1.checkout.sessions.create.return_value = session
-            resp = self.client.post(reverse("payments:create", args=[self.product.slug]), post)
+            gc.return_value.v1.coupons.create.return_value = mock.MagicMock(id="co_1")
+            data = {"email": email, "name": "Buyer", "accept_license": "on", **extra}
+            resp = self.client.post(reverse("payments:checkout"), data)
         return resp, gc
+
+    def _params(self, gc):
+        return gc.return_value.v1.checkout.sessions.create.call_args.kwargs["params"]
 
     def test_checkout_redirects_to_stripe_with_single_price(self):
         resp, gc = self._checkout()
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(resp["Location"], "https://checkout.stripe.com/c/pay/cs_test_1")
-        params = gc.return_value.v1.checkout.sessions.create.call_args.kwargs["params"]
+        params = self._params(gc)
         self.assertEqual(params["line_items"][0]["price_data"]["unit_amount"], 14900)
-        self.assertNotIn("allow_promotion_codes", params)
+        self.assertEqual(params["customer_email"], "buyer@example.com")
+        self.assertNotIn("discounts", params)
+        self.assertTrue(params["invoice_creation"]["enabled"])
 
     def test_checkout_team_license_uses_multiplier(self):
         ProductLicense.objects.create(product=self.product, tier=LicenseTier.TEAM)
-        resp, gc = self._checkout(license="team")
-        params = gc.return_value.v1.checkout.sessions.create.call_args.kwargs["params"]
+        resp, gc = self._checkout(tier="team")
+        params = self._params(gc)
         self.assertEqual(params["line_items"][0]["price_data"]["unit_amount"], 29800)  # 149 × 2
         self.assertIn("Team license", params["line_items"][0]["price_data"]["product_data"]["name"])
         self.assertEqual(Order.objects.get().items.get().license_tier, "team")
 
-    def test_checkout_rejects_tier_not_offered(self):
-        resp, gc = self._checkout(license="organization")
-        self.assertEqual(resp.status_code, 302)
+    def test_cart_rejects_tier_not_offered(self):
+        resp = self.client.post(reverse("orders:cart_add", args=[self.product.slug]), {"license": "organization"})
         self.assertEqual(resp["Location"], self.product.get_absolute_url())
-        gc.return_value.v1.checkout.sessions.create.assert_not_called()
+        self.assertEqual(self.client.session.get("cart", {}).get("items", []), [])
 
-    def test_draft_product_cannot_be_bought(self):
+    def test_draft_product_cannot_be_added(self):
         self.product.status = Product.Status.DRAFT
         self.product.save()
-        resp, _ = self._checkout()
+        resp = self.client.post(reverse("orders:cart_add", args=[self.product.slug]))
         self.assertEqual(resp.status_code, 404)
+
+    def test_checkout_requires_license_acceptance(self):
+        resp, gc = self._checkout(accept_license="")
+        self.assertEqual(resp.status_code, 400)
+        gc.return_value.v1.checkout.sessions.create.assert_not_called()
+
+    def test_coupon_creates_one_off_stripe_discount(self):
+        Coupon.objects.create(code="SAVE20", value=20)
+        resp, gc = self._checkout(coupon="save20")
+        order = Order.objects.get()
+        self.assertEqual(order.discount_total, Decimal("29.80"))
+        self.assertEqual(order.total, Decimal("119.20"))
+        self.assertEqual(order.coupon_code, "SAVE20")
+        coupon_params = gc.return_value.v1.coupons.create.call_args.kwargs["params"]
+        self.assertEqual(coupon_params["amount_off"], 2980)
+        self.assertEqual(self._params(gc)["discounts"], [{"coupon": "co_1"}])
+
+    def test_free_order_skips_stripe(self):
+        Coupon.objects.create(code="FREE", value=100)
+        resp, gc = self._checkout(coupon="FREE")
+        gc.return_value.v1.checkout.sessions.create.assert_not_called()
+        order = Order.objects.get()
+        self.assertEqual(order.status, Order.Status.PAID)
+        self.assertIn(f"order={order.number}", resp["Location"])
+
+    def test_per_customer_coupon_limit_checked_at_checkout(self):
+        coupon = Coupon.objects.create(code="ONCE", value=10, max_uses_per_customer=1)
+        earlier = self.paid_order()
+        Order.objects.filter(pk=earlier.pk).update(coupon=coupon)
+        resp, gc = self._checkout(coupon="ONCE")
+        self.assertEqual(resp.status_code, 400)
+        self.assertContains(resp, "already used", status_code=400)
+        gc.return_value.v1.checkout.sessions.create.assert_not_called()
 
     def test_webhook_marks_paid_grants_download_and_emails(self):
         order = create_order_for_product(self.product)
@@ -131,6 +179,10 @@ class CheckoutWebhookTests(BaseTestCase):
         self.assertEqual(resp.status_code, 200)
         order.refresh_from_db()
         self.assertEqual(order.status, Order.Status.PAID)
+        self.assertEqual(order.country, "BD")
+        self.assertEqual(order.name, "Ann")
+        self.assertEqual(order.stripe_fee, Decimal("4.62"))
+        self.assertEqual(order.invoice_url, "https://pay.stripe.com/invoice/x/pdf")
         ent = Entitlement.objects.get(order_item__order=order)
         self.assertEqual(ent.max_downloads, 5)
         self.assertEqual(len(mail.outbox), 1)
@@ -149,6 +201,37 @@ class CheckoutWebhookTests(BaseTestCase):
         self._post_webhook(self._event(order, payment_status="unpaid"))
         order.refresh_from_db()
         self.assertEqual(order.status, Order.Status.PENDING)
+
+    def _charge_event(self, etype, event_id, **obj):
+        return {"id": event_id, "type": etype, "data": {"object": {"payment_intent": "pi_123", **obj}}}
+
+    def test_full_refund_disables_downloads(self):
+        order = self.paid_order()
+        Order.objects.filter(pk=order.pk).update(stripe_payment_intent_id="pi_123")
+        self._post_webhook(self._charge_event("charge.refunded", "evt_r", amount_refunded=14900, refunded=True))
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.REFUNDED)
+        self.assertEqual(order.refunded_amount, Decimal("149"))
+        self.assertFalse(Entitlement.objects.get(order_item__order=order).is_active)
+
+    def test_partial_refund_keeps_access(self):
+        order = self.paid_order()
+        Order.objects.filter(pk=order.pk).update(stripe_payment_intent_id="pi_123")
+        self._post_webhook(self._charge_event("charge.refunded", "evt_p", amount_refunded=5000, refunded=False))
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.PAID)
+        self.assertEqual(order.refunded_amount, Decimal("50"))
+
+    def test_dispute_blocks_then_won_restores(self):
+        order = self.paid_order()
+        Order.objects.filter(pk=order.pk).update(stripe_payment_intent_id="pi_123")
+        self._post_webhook(self._charge_event("charge.dispute.created", "evt_d1", reason="fraudulent", amount=14900))
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.DISPUTED)
+        self.assertFalse(Entitlement.objects.get(order_item__order=order).is_active)
+        self._post_webhook(self._charge_event("charge.dispute.closed", "evt_d2", status="won"))
+        order.refresh_from_db()
+        self.assertEqual(order.status, Order.Status.PAID)
 
     def test_invalid_signature_rejected(self):
         resp = self.client.post(reverse("payments:stripe_webhook"), data="{}", content_type="application/json")

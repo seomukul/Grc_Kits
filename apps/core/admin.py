@@ -37,6 +37,7 @@ class SiteSettingsAdmin(ModelAdmin):
         ("Downloads", {"fields": ("download_limit", "download_link_ttl_hours")}),
         ("License tiers", {"fields": ("team_price_multiplier", "organization_price_multiplier", "team_max_users")}),
         ("Storefront badges", {"fields": ("new_badge_days", "bestseller_min_sales")}),
+        ("Checkout", {"fields": ("stripe_invoices",)}),
     )
 
     def has_add_permission(self, request):
