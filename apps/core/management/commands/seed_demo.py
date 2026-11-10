@@ -64,6 +64,13 @@ class Command(BaseCommand):
             self._files(p, ["Main file", "Implementation guide"] if ptype != "pdf" else ["Checklist"])
             products[title] = p
 
+        bb = products.get("BB CSF Compliance Tracker")
+        if bb and not bb.description:
+            from ._demo_descriptions import BB_CSF
+
+            bb.description = BB_CSF.strip()
+            bb.save(update_fields=["description"])
+
         bundle = self._product("ISO 27001 Complete Toolkit", cats["toolkits"], "bundle", "99.00", True)
         bundle.frameworks.set([fws["iso-27001"]])
         bundle.bundle_items.set(

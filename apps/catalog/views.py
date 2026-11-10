@@ -4,7 +4,10 @@ from django.db.models import Avg, Count, Q
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView
 
+from django.utils.html import strip_tags
+
 from apps.core.models import SiteSettings
+from apps.core.richtext import render_body
 from apps.pages.models import FAQItem
 from apps.downloads.models import Entitlement
 from apps.reviews.forms import ReviewForm
@@ -21,6 +24,9 @@ SORT_OPTIONS = {
 }
 
 RATING_FILTER = Q(reviews__is_approved=True)
+
+# Descriptions longer than this start collapsed with a "Read more" button.
+LONG_DESCRIPTION_WORDS = 250
 
 
 def _decimal(value):
@@ -117,7 +123,11 @@ class ProductDetailView(DetailView):
             order_item__order__user=user, order_item__order__status="paid", product=product
         ).exists()
         already_reviewed = user.is_authenticated and product.reviews.filter(user=user).exists()
+        description = render_body(product.description)
+        words = len(strip_tags(product.description or "").split())
         ctx.update(
+            description_html=description.html if words else "",
+            description_long=words > LONG_DESCRIPTION_WORDS,
             site_settings=site_settings,
             license_options=product.license_options(site_settings),
             reviews=product.reviews.filter(is_approved=True).select_related("user")[:10],

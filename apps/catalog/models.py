@@ -8,8 +8,10 @@ from django.db import models
 from django.db.models import Count, Q
 from django.urls import reverse
 from django.utils import timezone
+from django_prose_editor.fields import ProseEditorField
 
 from apps.core.models import SiteSettings, TimeStampedModel
+from apps.core.richtext import RICH_TEXT
 
 
 class Framework(TimeStampedModel):
@@ -98,8 +100,15 @@ class Product(TimeStampedModel):
     frameworks = models.ManyToManyField(Framework, blank=True, related_name="products")
     product_type = models.CharField(max_length=20, choices=ProductType.choices, default=ProductType.EXCEL)
 
-    short_description = models.CharField(max_length=300)
-    description = models.TextField(blank=True)
+    short_description = models.CharField(max_length=300, help_text="One or two sentences for cards and search results.")
+    description = ProseEditorField(
+        "long description",
+        config=RICH_TEXT,
+        sanitize=True,
+        blank=True,
+        help_text="Full product page content: headings, lists, tables, images. "
+        "Paste a YouTube/Vimeo link on its own line to embed a video.",
+    )
     whats_included = models.TextField(blank=True, help_text="One item per line.")
     system_requirements = models.CharField(max_length=200, blank=True, help_text="e.g. Microsoft Excel 2016 or later")
 

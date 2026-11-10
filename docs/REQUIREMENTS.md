@@ -48,7 +48,7 @@ Frameworks to seed: ISO 27001, ISO 42001, NIST, BB CSF (Bangladesh Bank), PCI DS
 ## 4. Products
 
 ### 4.1 Admin fields
-- ✅ Title, slug, short + long description · ⬜ rich-text editor
+- ✅ Title, slug, short + long description · ✅ rich-text editor (shared with the blog; long text collapses with "Read more")
 - ✅ Cover image · ✅ gallery images · ✅ preview video
 - ✅ Price (USD) · ✅ **license tiers: Single user / Team / Organization pricing** (owner idea #3)
 - ✅ Category · ✅ framework tags (M2M) · ✅ product type: *Excel tool, Word template, PDF, Bundle*

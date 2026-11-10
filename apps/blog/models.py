@@ -10,34 +10,10 @@ from django.utils.html import strip_tags
 from django_prose_editor.fields import ProseEditorField
 
 from apps.core.models import TimeStampedModel
+from apps.core.richtext import RICH_TEXT
 
-# Rich-text editor features. The same list drives server-side sanitization (nh3),
-# so editors can only save the HTML these extensions produce.
-BODY_EDITOR = {
-    "extensions": {
-        "Bold": True,
-        "Italic": True,
-        "Underline": True,
-        "Strike": True,
-        "Code": True,
-        "Heading": {"levels": [2, 3, 4]},
-        "BulletList": True,
-        "OrderedList": True,
-        "ListItem": True,
-        "Blockquote": True,
-        "HorizontalRule": True,
-        "Link": {"enableTarget": True},
-        "CodeBlock": True,
-        "Table": True,
-        "TableRow": True,
-        "TableHeader": True,
-        "TableCell": True,
-        "Image": True,
-        "Figure": True,
-        "Caption": True,
-        "Typographic": True,
-    }
-}
+# Editor features + sanitization rules live in apps/core/richtext.py (shared with products).
+BODY_EDITOR = RICH_TEXT
 
 
 class BlogCategory(TimeStampedModel):

@@ -102,11 +102,21 @@
 {# --- Details ---------------------------------------------------------------- #}
 <div class="container-page mt-16 grid gap-12 lg:grid-cols-[1fr_20rem]">
   <div class="min-w-0 space-y-14">
-    {% if product.description %}
-    <section>
+    {% if description_html %}
+    <section id="description" class="scroll-mt-24" {% if description_long %}x-data="{ expanded: false }"{% endif %}>
       <p class="eyebrow">Description</p>
       <h2 class="section-title !text-3xl">About this toolkit</h2>
-      <div class="prose prose-slate mt-5 max-w-none prose-headings:font-display">{{ product.description|linebreaks }}</div>
+      <div class="relative mt-5 {% if description_long %}max-h-[28rem] overflow-hidden{% endif %}" {% if description_long %}:class="expanded && '!max-h-none'"{% endif %}>
+        <div class="prose prose-slate max-w-none prose-headings:scroll-mt-24 prose-headings:font-display prose-headings:font-semibold prose-a:text-brand-700 prose-blockquote:border-brand-400 prose-img:rounded-md prose-pre:bg-brand-950">
+          {{ description_html }}
+        </div>
+        {% if description_long %}<div x-show="!expanded" class="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-50 to-transparent"></div>{% endif %}
+      </div>
+      {% if description_long %}
+      <button type="button" class="btn-secondary mt-4" @click="expanded = !expanded; if (!expanded) $el.closest('section').scrollIntoView({behavior: 'smooth'})" :aria-expanded="expanded">
+        <span x-text="expanded ? 'Show less' : 'Read full description'">Read full description</span>
+      </button>
+      {% endif %}
     </section>
     {% endif %}
 
