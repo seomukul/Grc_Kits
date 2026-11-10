@@ -110,3 +110,12 @@ class BlogTests(TestCase):
         self.parent.parent = self.child
         with self.assertRaises(ValidationError):
             self.parent.full_clean()
+
+
+class AdminEditorStylesTests(TestCase):
+    @override_settings(ADMIN_2FA_REQUIRED=False)
+    def test_admin_loads_editor_stylesheet(self):
+        self.client.force_login(User.objects.create_superuser("o2", "o2@x.com", "pw"))
+        resp = self.client.get(reverse("admin:blog_post_add"))
+        self.assertContains(resp, "css/admin.css")
+        self.assertContains(resp, "prose-editor")

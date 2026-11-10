@@ -8,6 +8,7 @@ All secrets and per-environment values come from environment variables (.env).
 from pathlib import Path
 
 import environ
+from django.templatetags.static import static
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -265,6 +266,7 @@ UNFOLD = {
     "SITE_URL": "/",
     "SITE_SYMBOL": "shield_lock",
     "DASHBOARD_CALLBACK": "apps.dashboard.admin_dashboard.dashboard_callback",
+    "STYLES": [lambda request: static("css/admin.css")],
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "COLORS": {
