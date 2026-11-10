@@ -52,7 +52,7 @@
         <div class="flex items-baseline gap-3">
           <span class="font-display text-4xl text-brand-700">$<span x-text="prices[tier]">{{ product.price|floatformat:"-2" }}</span></span>
           {% if product.compare_at_price %}<span x-show="tier === 'single'" class="text-lg text-slate-400 line-through">${{ product.compare_at_price|floatformat:"-2" }}</span>{% endif %}
-          <span class="text-xs uppercase tracking-wider text-slate-500">one-time</span>
+          <span class="text-xs uppercase tracking-wider text-slate-500">USD · one-time</span>
         </div>
 
         <form method="post" action="{% url 'orders:cart_add' product.slug %}" class="mt-6 space-y-4" x-data="{ loading: false }"

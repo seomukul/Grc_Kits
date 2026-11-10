@@ -1,5 +1,7 @@
 from django.db.models import Avg, Count, Q
 from django.shortcuts import get_object_or_404, render
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
 
 from apps.blog.models import Post
@@ -121,6 +123,27 @@ def contact(request):
     )
 
 
+def fill_placeholders(body, page, site_settings, request):
+    """Replace [[tokens]] in CMS pages with live Site settings, so legal pages never go stale."""
+    s = site_settings
+    values = {
+        "legal_name": s.legal_name,
+        "registration": s.registration,
+        "registration_suffix": f", {s.registration}" if s.registration else "",
+        "address": " ".join(s.business_address.split()) or "[business address not set]",
+        "email": s.contact_email,
+        "phone": s.support_phone,
+        "phone_line": f", phone: {s.support_phone}" if s.support_phone else "",
+        "governing_law": s.governing_law or "[governing law not set]",
+        "site_url": request.build_absolute_uri("/").rstrip("/"),
+        "updated": f"{page.updated_at:%B} {page.updated_at.day}, {page.updated_at:%Y}",
+    }
+    for key, value in values.items():
+        body = body.replace(f"[[{key}]]", escape(value))
+    return mark_safe(body)
+
+
 def page_detail(request, slug):
     page = get_object_or_404(Page, slug=slug, is_published=True)
-    return render(request, "pages/page.html", {"page": page})
+    body = fill_placeholders(page.body, page, SiteSettings.load(), request)
+    return render(request, "pages/page.html", {"page": page, "body": body})

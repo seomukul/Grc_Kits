@@ -69,6 +69,11 @@ from .models import SiteSettings  # noqa: E402
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(ModelAdmin):
     fieldsets = (
+        ("Business details (footer & legal pages)", {
+            "fields": ("legal_name", "registration", "business_address", "governing_law",
+                       "support_phone", "support_hours", "footer_disclaimer"),
+            "description": "Stripe reviews these on your website. Use the same legal name and address as your Stripe account.",
+        }),
         ("Downloads", {"fields": ("download_limit", "download_link_ttl_hours")}),
         ("License tiers", {"fields": ("team_price_multiplier", "organization_price_multiplier", "team_max_users")}),
         ("Storefront badges", {"fields": ("new_badge_days", "bestseller_min_sales")}),

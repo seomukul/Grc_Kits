@@ -1,9 +1,25 @@
 {% extends "base.html" %}
 {% block title %}{{ page.title }} – {{ SITE_NAME }}{% endblock %}
-{% block meta_description %}{{ page.meta_description }}{% endblock %}
+{% block meta_description %}{{ page.meta_description|default:page.title }}{% endblock %}
 {% block content %}
-<article class="container-page max-w-3xl py-16">
-  <h1 class="text-3xl font-bold text-slate-900">{{ page.title }}</h1>
-  <div class="prose prose-slate mt-8 max-w-none">{{ page.body|safe }}</div>
-</article>
+<section class="bg-brand-900 text-slate-300">
+  <div class="container-page max-w-4xl py-14">
+    <p class="eyebrow !text-brand-300">{% if page.show_in_footer %}Legal{% else %}{{ SITE_NAME }}{% endif %}</p>
+    <h1 class="mt-3 text-4xl text-slate-50 sm:text-5xl">{{ page.title }}</h1>
+  </div>
+</section>
+<div class="container-page grid max-w-5xl gap-12 py-14 lg:grid-cols-[1fr_14rem]">
+  <article class="prose prose-slate max-w-none prose-headings:font-display prose-headings:font-semibold prose-a:text-brand-700 [&_.legal-note]:text-sm [&_.legal-note]:text-slate-500">{{ body }}</article>
+  {% if page.show_in_footer and footer_pages %}
+  <nav class="hidden lg:block" aria-label="Legal pages">
+    <div class="sticky top-24 rounded-md border border-slate-200 bg-paper p-5 text-sm">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Policies</p>
+      <ul class="mt-3 space-y-1.5">
+        {% for p in footer_pages %}<li><a href="{{ p.get_absolute_url }}" class="{% if p.slug == page.slug %}font-semibold text-brand-700{% else %}text-slate-700 hover:text-brand-700{% endif %}">{{ p.title }}</a></li>{% endfor %}
+      </ul>
+      <p class="mt-5 border-t border-slate-200 pt-4 text-xs text-slate-500">Questions? <a href="mailto:{{ site_settings.contact_email }}" class="text-brand-700 underline">{{ site_settings.contact_email }}</a></p>
+    </div>
+  </nav>
+  {% endif %}
+</div>
 {% endblock %}

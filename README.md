@@ -163,6 +163,15 @@ An editorial, "auditor-grade" look: midnight navy, gold and warm paper, with ser
 - **Two-factor authentication:** when `ADMIN_2FA_REQUIRED=True` (the production default), every staff member scans a QR code with an authenticator app at first login and gets 8 one-time backup codes. If someone loses their phone, use Admin → Users → *Reset two-factor*. In local dev it's off unless you set it in `.env`.
 - **Demo data for the dashboard (dev only):** `python manage.py seed_sales` creates 150 fake orders.
 
+## Stripe account review: website checklist
+
+Stripe looks for these on the live site. They're all built in; you only fill in the details.
+
+- **Admin → Site settings → Business details:** legal business name (exactly as on your Stripe account), registration, full address, governing law, phone and support hours. They appear in the footer and are inserted into the legal pages (`[[legal_name]]`, `[[address]]`…). The admin dashboard shows a warning while any of them is missing.
+- **Legal pages** (created by `seed_content`, all linked in the footer): Terms of Service, Privacy Policy, Refund & Cancellation Policy, Delivery Policy, License Terms, Cookie Policy, Disclaimer. They're drafts, so have a lawyer review them. Edit them in Admin → Pages; `seed_content` never overwrites your edits.
+- **Footer:** contact email and phone, support hours, response time, legal name and address, "All prices in US dollars (USD)", accepted payment methods, and a disclaimer.
+- **Products:** prices are shown with "USD · one-time", there's a clear description and delivery method, and checkout requires accepting the License Terms and Refund Policy.
+
 ## Call booking (built in, Calendly-style)
 
 Visitors book a call on `/contact/` (the *Book a call* tab). They pick a highlighted date, see free times in **their own timezone** (detected by the browser), and confirm with their name and email. Both sides get an email with a calendar invite (`.ics`), and the visitor gets a link to manage or cancel the booking.

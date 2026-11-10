@@ -15,7 +15,7 @@
     <div class="mt-auto flex items-end justify-between gap-3 pt-5">
       <div>
         <p class="font-display text-2xl text-brand-700">${{ product.price|floatformat:"-2" }}{% if product.compare_at_price %} <span class="text-sm text-slate-400 line-through">${{ product.compare_at_price|floatformat:"-2" }}</span>{% endif %}</p>
-        <p class="text-[11px] uppercase tracking-wider text-slate-500">one-time</p>
+        <p class="text-[11px] uppercase tracking-wider text-slate-500">USD · one-time</p>
       </div>
       <form method="post" action="{% url 'orders:cart_add' product.slug %}">
         {% csrf_token %}<input type="hidden" name="license" value="single">

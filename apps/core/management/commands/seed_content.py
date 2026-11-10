@@ -339,12 +339,20 @@ class Command(BaseCommand):
                 FAQItem.objects.create(topic=topic, question=q, answer=a, order=i, show_on_products=topic in ("delivery", "licensing"))
                 created += 1
 
-        for slug, title, body in [("license", "License Terms", LICENSE_TERMS), ("refunds", "Refund Policy", REFUND_POLICY)]:
-            page, is_new = Page.objects.get_or_create(slug=slug, defaults={"title": title, "body": body, "show_in_footer": True})
-            if not is_new and "content goes here" in page.body:  # replace seed_demo placeholder only
-                page.body = body
-                page.save(update_fields=["body"])
+        from ._legal_pages import LEGAL_PAGES
+
+        old_drafts = {LICENSE_TERMS.strip(), REFUND_POLICY.strip()}
+        for slug, title, body, order in LEGAL_PAGES:
+            page, is_new = Page.objects.get_or_create(
+                slug=slug, defaults={"title": title, "body": body.strip(), "show_in_footer": True, "footer_order": order}
+            )
             created += is_new
+            # Upgrade untouched placeholders/old drafts only; never overwrite the owner's edits.
+            if not is_new and ("content goes here" in page.body or page.body.strip() in old_drafts):
+                page.title, page.body, page.footer_order, page.show_in_footer = title, body.strip(), order, True
+                page.save()
+        # The About page has its own view now; don't list the old CMS stub in the legal column.
+        Page.objects.filter(slug="about").update(show_in_footer=False)
 
         from apps.blog.models import BlogCategory
 

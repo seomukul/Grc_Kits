@@ -58,6 +58,29 @@ class SiteSettings(models.Model):
     )
     abandoned_cart_delay_hours = models.PositiveIntegerField(default=2)
 
+    # Business identity (shown in the footer and on legal pages; Stripe checks these)
+    legal_name = models.CharField(
+        "legal business name", max_length=150, default="GRCkits",
+        help_text="Exactly as registered, e.g. 'GRCkits LLC'. Must match your Stripe account.",
+    )
+    registration = models.CharField(
+        max_length=200, blank=True,
+        help_text="e.g. 'Registered in Wyoming, USA' or 'Company no. 12345678'.",
+    )
+    business_address = models.TextField(blank=True, help_text="Full registered/business address.")
+    governing_law = models.CharField(
+        max_length=120, blank=True, help_text="Used in the Terms, e.g. 'the State of Wyoming, USA'.",
+    )
+    support_phone = models.CharField(max_length=40, blank=True, help_text="Optional, e.g. +1 (555) 123-4567.")
+    support_hours = models.CharField(max_length=120, default="Mon–Fri, 9:00–18:00 (GMT+6)")
+    footer_disclaimer = models.TextField(
+        blank=True,
+        default=(
+            "GRCkits templates and toolkits are provided for guidance and must be tailored to your organization. "
+            "They do not constitute legal advice and do not guarantee certification or regulatory compliance."
+        ),
+    )
+
     # Contact & social
     contact_email = models.EmailField(default="hello@grckits.com")
     response_time_note = models.CharField(max_length=120, default="We reply within one business day.")
@@ -91,6 +114,16 @@ class SiteSettings(models.Model):
 
     class Meta:
         verbose_name = verbose_name_plural = "site settings"
+
+    @property
+    def stripe_ready_missing(self):
+        """Business details Stripe reviewers expect to see on the site that are still empty."""
+        checks = {
+            "Legal business name": self.legal_name and self.legal_name != "GRCkits",
+            "Business address": self.business_address,
+            "Contact email": self.contact_email,
+        }
+        return [label for label, ok in checks.items() if not ok]
 
     def __str__(self):
         return "Site settings"

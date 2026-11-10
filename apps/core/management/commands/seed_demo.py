@@ -81,10 +81,7 @@ class Command(BaseCommand):
 
         for title, slug in [
             ("About", "about"),
-            ("Terms of Service", "terms"),
-            ("Privacy Policy", "privacy"),
-            ("Refund Policy", "refunds"),
-            ("License Terms", "license"),
+
         ]:
             Page.objects.get_or_create(
                 slug=slug,

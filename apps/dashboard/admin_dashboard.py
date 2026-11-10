@@ -66,7 +66,10 @@ def dashboard_callback(request, context):
     mix["new_pct"] = round(mix["new"] / mix["total"] * 100) if mix["total"] else 0
     funnel = analytics.funnel(period)
 
+    from apps.core.models import SiteSettings
+
     context.update({
+        "stripe_missing": SiteSettings.load().stripe_ready_missing,
         "analytics": True,
         "period": period,
         "presets": analytics.PRESETS.items(),

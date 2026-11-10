@@ -7,8 +7,8 @@ from .models import AboutProfile, FAQItem, HeroSlide, HomeSection, Page, Testimo
 
 @admin.register(Page)
 class PageAdmin(ModelAdmin):
-    list_display = ("title", "slug", "is_published", "show_in_footer", "updated_at")
-    list_editable = ("is_published", "show_in_footer")
+    list_display = ("title", "slug", "is_published", "show_in_footer", "footer_order", "updated_at")
+    list_editable = ("is_published", "show_in_footer", "footer_order")
     prepopulated_fields = {"slug": ("title",)}
     search_fields = ("title", "body")
 

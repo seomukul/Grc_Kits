@@ -9,6 +9,13 @@
   {% include "unfold/helpers/dashboard_default.html" %}
 {% else %}
 <div style="display:flex;flex-direction:column;gap:1.5rem">
+  {% if stripe_missing %}
+  <div class="border rounded-default px-4 py-3 text-sm" style="border-color:#f59e0b;background:#fffbeb;color:#92400e">
+    <strong>Before applying to Stripe:</strong> fill in {{ stripe_missing|join:", " }} in
+    <a href="{% url 'admin:core_sitesettings_changelist' %}" class="underline">Site settings → Business details</a>.
+    They appear in the footer and on the legal pages.
+  </div>
+  {% endif %}
 
   {# Period selector #}
   <form method="get" style="display:flex;flex-wrap:wrap;align-items:center;gap:.5rem">

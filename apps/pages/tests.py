@@ -183,3 +183,76 @@ class TemplateHygieneTests(TestCase):
         for url in ["/", "/services/", "/kits/", "/blog/", "/contact/", "/cart/"]:
             html = self.client.get(url).content.decode()
             self.assertIsNone(re.search(r"\{#|#\}|\{%|%\}", html), f"Template syntax visible on {url}")
+
+
+class StripeReadinessTests(TestCase):
+    """Footer + legal pages carry the business details payment providers check for."""
+
+    def setUp(self):
+        call_command("seed_content", verbosity=0)
+
+    def test_legal_pages_exist_and_are_in_footer(self):
+        html = self.client.get("/").content.decode()
+        for slug, title in [("terms", "Terms of Service"), ("privacy", "Privacy Policy"),
+                            ("refunds", "Refund &amp; Cancellation Policy"), ("delivery", "Delivery Policy"),
+                            ("license", "License Terms"), ("cookies", "Cookie Policy"), ("disclaimer", "Disclaimer")]:
+            self.assertIn(f'href="/{slug}/"', html)
+            self.assertIn(title, html)
+            self.assertEqual(self.client.get(f"/{slug}/").status_code, 200)
+        self.assertIn("All prices in US dollars (USD)", html)
+        self.assertIn("Secure payments by Stripe", html)
+
+    def test_business_details_flow_into_footer_and_pages(self):
+        from apps.core.models import SiteSettings
+
+        s = SiteSettings.load()
+        s.legal_name = "GRCkits LLC"
+        s.registration = "Registered in Wyoming, USA"
+        s.business_address = "30 N Gould St, Sheridan, WY 82801"
+        s.governing_law = "the State of Wyoming, USA"
+        s.support_phone = "+1 (555) 010-0000"
+        s.save()
+        html = self.client.get("/").content.decode()
+        for text in ["GRCkits LLC · Registered in Wyoming, USA", "30 N Gould St", "+1 (555) 010-0000", "&copy;"]:
+            self.assertIn(text, html)
+        terms = self.client.get("/terms/").content.decode()
+        self.assertIn('GRCkits LLC ("we", "us"), Registered in Wyoming, USA.', terms.replace("&quot;", '"'))
+        self.assertIn("the State of Wyoming, USA", terms)
+        self.assertNotIn("[[", terms)
+        self.assertEqual(s.stripe_ready_missing, [])
+
+    def test_placeholders_are_escaped(self):
+        from apps.core.models import SiteSettings
+
+        s = SiteSettings.load()
+        s.legal_name = "<script>x</script> Ltd"
+        s.save()
+        self.assertNotIn("<script>x</script>", self.client.get("/privacy/").content.decode())
+
+    def test_seed_does_not_overwrite_edited_pages(self):
+        from apps.pages.models import Page
+
+        Page.objects.filter(slug="privacy").update(body="<p>Lawyer-approved text</p>")
+        call_command("seed_content", verbosity=0)
+        self.assertEqual(Page.objects.get(slug="privacy").body, "<p>Lawyer-approved text</p>")
+
+    @override_settings(ADMIN_2FA_REQUIRED=False)
+    def test_admin_warns_when_business_details_missing(self):
+        from django.contrib.auth import get_user_model
+
+        from apps.core.models import SiteSettings
+
+        SiteSettings.objects.filter(pk=1).update(business_address="")
+        self.client.force_login(get_user_model().objects.create_superuser("o", "o@x.com", "pw"))
+        self.assertContains(self.client.get("/admin/"), "Before applying to Stripe")
+
+    def test_registered_company_details_present_by_default(self):
+        """The data migration fills GRC Kits LLC's registered details on a fresh database."""
+        from apps.core.models import SiteSettings
+
+        s = SiteSettings.load()
+        self.assertEqual(s.legal_name, "GRC Kits LLC")
+        self.assertIn("LC014795326", s.registration)
+        self.assertIn("Harrisonville, MO 64701", s.business_address)
+        self.assertEqual(s.governing_law, "the State of Missouri, USA")
+        self.assertEqual(s.stripe_ready_missing, [])

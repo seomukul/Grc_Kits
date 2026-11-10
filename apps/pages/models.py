@@ -9,13 +9,17 @@ class Page(TimeStampedModel):
 
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
-    body = models.TextField(help_text="HTML allowed. Only staff can edit this.")
+    body = models.TextField(
+        help_text="HTML allowed. Placeholders filled from Site settings: [[legal_name]], [[registration]], "
+        "[[address]], [[email]], [[phone]], [[governing_law]], [[site_url]], [[updated]].",
+    )
     is_published = models.BooleanField(default=True)
     show_in_footer = models.BooleanField(default=False)
+    footer_order = models.PositiveSmallIntegerField(default=100)
     meta_description = models.CharField(max_length=160, blank=True)
 
     class Meta:
-        ordering = ["title"]
+        ordering = ["footer_order", "title"]
 
     def __str__(self):
         return self.title
