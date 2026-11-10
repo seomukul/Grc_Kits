@@ -1,0 +1,16 @@
+{% load tz %}{% autoescape off %}{% timezone b.visitor_timezone %}Hi {{ b.name }},
+
+{% if b.status == "pending" %}Thanks! We've received your request for a call. We'll confirm it shortly.{% else %}Your call is booked.{% endif %}
+
+When: {{ local_start|date:"l, j F Y, H:i" }} ({{ b.visitor_timezone }}), {{ settings.duration_minutes }} minutes
+{% if b.meeting_link %}Join: {{ b.meeting_link }}
+{% else %}We'll email you the meeting link before the call.
+{% endif %}{% if b.service %}Topic: {{ b.service }}
+{% endif %}Reference: {{ b.short_ref }}
+
+The attached invite adds the call to your calendar.
+
+Need to cancel or pick another time? {{ manage_url }}
+
+– The {{ SITE_NAME }} team
+{% endtimezone %}{% endautoescape %}

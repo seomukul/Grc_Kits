@@ -1,0 +1,4 @@
+<div class="mt-8 rounded-md border border-amber-300 bg-amber-50 p-5 text-sm text-amber-900"
+     hx-get="{% url 'bookings:month' %}?tz={{ tz|urlencode }}" hx-target="#booking-month" hx-trigger="load">
+  Sorry, someone just booked that time. The calendar has been refreshed; please pick another slot.
+</div>

@@ -1,0 +1,27 @@
+{# Booking widget. Expects: booking_settings, optional booking_service_id. #}
+<div id="book" class="@container scroll-mt-24"
+     x-data="{ tz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC', selected: '' }">
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h2 class="font-display text-2xl text-slate-900">{{ booking_settings.title }}</h2>
+      {% if booking_settings.description %}<p class="mt-1 text-sm text-slate-600">{{ booking_settings.description }}</p>{% endif %}
+    </div>
+    <p class="text-xs text-slate-500">
+      <span class="inline-flex items-center gap-1">{% include "partials/_icon.html" with name="calendar" cls="size-4" %} {{ booking_settings.duration_minutes }} min · online</span><br>
+      Times in <strong x-text="tz">your timezone</strong>
+    </p>
+  </div>
+
+  <div class="mt-6 grid gap-6 @2xl:grid-cols-[minmax(0,24rem)_minmax(14rem,1fr)]">
+    <div id="booking-month"
+         hx-get="{% url 'bookings:month' %}" hx-trigger="load"
+         hx-vals='js:{tz: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"}'>
+      <div class="grid h-72 place-items-center text-sm text-slate-500">Loading available dates…</div>
+    </div>
+    <div id="booking-day" class="min-h-40 rounded-md border border-dashed border-slate-300 p-4 text-sm text-slate-500">
+      Pick a highlighted date to see available times.
+    </div>
+  </div>
+
+  <div id="booking-form" data-service="{{ booking_service_id|default:'' }}"></div>
+</div>

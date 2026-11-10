@@ -1,0 +1,5 @@
+{% load tz %}{% autoescape off %}Booking {{ b.short_ref }} was cancelled{% if by_visitor %} by {{ b.name }}{% endif %}.
+
+Was: {{ owner_start|timezone:settings.timezone|date:"l, j F Y, H:i" }} ({{ settings.timezone }})
+{{ b.name }} <{{ b.email }}>
+{% endautoescape %}

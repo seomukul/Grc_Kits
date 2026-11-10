@@ -73,6 +73,7 @@ LOCAL_APPS = [
     "apps.services",
     "apps.pages",
     "apps.dashboard",
+    "apps.bookings",
 ]
 
 INSTALLED_APPS = UNFOLD_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -301,6 +302,9 @@ UNFOLD = {
                     {"title": _("Blog tags"), "icon": "sell", "link": reverse_lazy("admin:blog_tag_changelist")},
                     {"title": _("Media library"), "icon": "photo_library", "link": reverse_lazy("admin:blog_mediaasset_changelist")},
                     {"title": _("Services"), "icon": "handshake", "link": reverse_lazy("admin:services_service_changelist")},
+                    {"title": _("Call bookings"), "icon": "event", "link": reverse_lazy("admin:bookings_booking_changelist")},
+                    {"title": _("Booking availability"), "icon": "schedule", "link": reverse_lazy("admin:bookings_bookingsettings_changelist")},
+                    {"title": _("Days off"), "icon": "event_busy", "link": reverse_lazy("admin:bookings_blockeddate_changelist")},
                     {"title": _("Leads (inquiries)"), "icon": "mail", "link": reverse_lazy("admin:services_serviceinquiry_changelist")},
                     {"title": _("Home page sections"), "icon": "dashboard_customize", "link": reverse_lazy("admin:pages_homesection_changelist")},
                     {"title": _("Hero slides"), "icon": "view_carousel", "link": reverse_lazy("admin:pages_heroslide_changelist")},

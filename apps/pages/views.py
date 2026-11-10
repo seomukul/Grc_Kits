@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 
 from apps.blog.models import Post
+from apps.bookings.models import BookingSettings
 from apps.catalog.models import Category, Framework, Product
 from apps.core.models import SiteSettings
 from apps.marketing.forms import SubscribeForm
@@ -104,13 +105,19 @@ def about(request):
 def contact(request):
     if request.method == "POST":
         return handle_inquiry(request, source="contact", template="pages/_contact_form.html")
-    initial = {}
+    initial, service = {}, None
     if slug := request.GET.get("service"):
-        initial["service"] = Service.objects.filter(slug=slug, is_active=True).first()
+        service = Service.objects.filter(slug=slug, is_active=True).first()
+        initial["service"] = service
     return render(
         request,
         "pages/contact.html",
-        {"form": InquiryForm(initial=initial), "site_settings": SiteSettings.load()},
+        {
+            "form": InquiryForm(initial=initial),
+            "site_settings": SiteSettings.load(),
+            "booking_settings": BookingSettings.load(),
+            "booking_service_id": service.pk if service else "",
+        },
     )
 
 

@@ -163,6 +163,17 @@ An editorial, "auditor-grade" look: midnight navy, gold and warm paper, with ser
 - **Two-factor authentication:** when `ADMIN_2FA_REQUIRED=True` (the production default), every staff member scans a QR code with an authenticator app at first login and gets 8 one-time backup codes. If someone loses their phone, use Admin → Users → *Reset two-factor*. In local dev it's off unless you set it in `.env`.
 - **Demo data for the dashboard (dev only):** `python manage.py seed_sales` creates 150 fake orders.
 
+## Call booking (built in, Calendly-style)
+
+Visitors book a call on `/contact/` (the *Book a call* tab). They pick a highlighted date, see free times in **their own timezone** (detected by the browser), and confirm with their name and email. Both sides get an email with a calendar invite (`.ics`), and the visitor gets a link to manage or cancel the booking.
+
+- **Admin → Booking availability:** your timezone, call length, buffer between calls, minimum notice, how far ahead people can book, a daily limit, your Meet/Zoom link, auto-confirm or manual approval, and weekly hours. Add several rows for split days. The default is Sunday–Thursday, 10:00–17:00, Asia/Dhaka.
+- **Admin → Days off:** dates when nobody can book (holidays, travel).
+- **Admin → Call bookings:** shows upcoming calls by default, in your time and theirs. *Confirm* and *Cancel* email the visitor; a cancelled time becomes free again.
+- **No double booking:** availability is checked again at submit, and a database constraint allows only one active booking per start time. Forms have the same spam protection as the contact form, plus a per-IP limit.
+- **Limitation:** it doesn't sync with Google or Outlook Calendar. Add busy days under *Days off*, or remove hours from the weekly availability.
+- Service pages and product pages link to `/contact/?service=<slug>#book`, which preselects the topic.
+
 ## Blog, marketing and analytics
 
 - **Blog:** categories (nested), tags, a rich-text editor (headings, tables, images, code, links), video embeds (paste a YouTube or Vimeo link on its own line), attachments, and Draft / Scheduled / Published status. Scheduled posts go live on their own, no cron needed. You also get reading time, an automatic table of contents (3+ headings), related posts, product and service CTAs, share buttons, RSS at `/blog/feed/` and Atom at `/blog/feed/atom/`, and JSON-LD. Staff can preview drafts. HTML is sanitized with nh3 on save and again on render.

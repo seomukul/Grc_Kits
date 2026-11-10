@@ -1,0 +1,13 @@
+{% load tz %}{% timezone b.visitor_timezone %}<div class="mt-8 rounded-md border border-emerald-300 bg-emerald-50 p-6">
+  <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-800">{% if b.status == "pending" %}Request received{% else %}You're booked{% endif %}</p>
+  <p class="mt-1 font-display text-2xl text-slate-900">{{ local|date:"l, j F Y" }} · {{ local|time:"H:i" }}</p>
+  <p class="mt-1 text-sm text-slate-600">{{ settings.duration_minutes }} minutes · {{ b.visitor_timezone }} · Ref {{ b.short_ref }}</p>
+  <p class="mt-3 text-sm text-slate-700">
+    {% if b.status == "pending" %}We'll confirm by email shortly.{% else %}A confirmation with the meeting details is on its way to <strong>{{ b.email }}</strong>.{% endif %}
+  </p>
+  <div class="mt-5 flex flex-wrap gap-3">
+    <a href="{% url 'bookings:invite' token %}" class="btn-primary">{% include "partials/_icon.html" with name="calendar" cls="size-4" %} Add to calendar</a>
+    <a href="{% url 'bookings:manage' token %}" class="btn-secondary">Manage booking</a>
+  </div>
+</div>
+{% endtimezone %}

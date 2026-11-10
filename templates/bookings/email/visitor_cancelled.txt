@@ -1,0 +1,9 @@
+{% load tz %}{% autoescape off %}{% timezone b.visitor_timezone %}Hi {{ b.name }},
+
+{% if by_visitor %}Your call on {{ local_start|date:"l, j F Y, H:i" }} ({{ b.visitor_timezone }}) has been cancelled as requested.{% else %}Unfortunately we had to cancel your call on {{ local_start|date:"l, j F Y, H:i" }} ({{ b.visitor_timezone }}).{% if b.cancelled_reason %}
+Reason: {{ b.cancelled_reason }}{% endif %} Sorry for the inconvenience.{% endif %}
+
+Book another time: {{ SITE_URL }}/contact/#book
+
+– The {{ SITE_NAME }} team
+{% endtimezone %}{% endautoescape %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load tz %}
+{% block title %}Your call booking – {{ SITE_NAME }}{% endblock %}
+{% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}{% timezone b.visitor_timezone %}
+<div class="container-page max-w-2xl py-16">
+  <p class="eyebrow">Booking {{ b.short_ref }}</p>
+  <h1 class="mt-3 text-3xl text-slate-900">{{ settings.title }}</h1>
+  <div class="card mt-8 p-6">
+    <p class="text-sm text-slate-500">Status</p>
+    <p class="font-semibold {% if b.status == 'cancelled' %}text-red-700{% elif b.status == 'pending' %}text-amber-700{% else %}text-emerald-700{% endif %}">{{ b.get_status_display }}</p>
+    <p class="mt-4 text-sm text-slate-500">When</p>
+    <p class="font-display text-xl text-slate-900">{{ local|date:"l, j F Y" }} · {{ local|time:"H:i" }}</p>
+    <p class="text-xs text-slate-500">{{ settings.duration_minutes }} minutes · {{ b.visitor_timezone }}</p>
+    {% if b.meeting_link and b.is_active %}<p class="mt-4 text-sm text-slate-500">Join</p><a href="{{ b.meeting_link }}" class="text-brand-700 underline" rel="noopener">{{ b.meeting_link }}</a>{% endif %}
+    {% if b.is_active %}
+    <div class="mt-6 flex flex-wrap gap-3 border-t border-slate-200 pt-6" x-data="{ confirm: false }">
+      <a href="{% url 'bookings:invite' token %}" class="btn-secondary">Add to calendar</a>
+      <button type="button" class="btn-secondary !text-red-700" x-show="!confirm" @click="confirm = true">Cancel this call</button>
+      <form method="post" x-cloak x-show="confirm" class="flex items-center gap-3">
+        {% csrf_token %}<input type="hidden" name="action" value="cancel">
+        <span class="text-sm text-slate-600">Cancel for sure?</span>
+        <button class="btn bg-red-700 text-white hover:bg-red-800">Yes, cancel</button>
+      </form>
+    </div>
+    <p class="mt-4 text-xs text-slate-500">To reschedule, cancel this call and book a new time.</p>
+    {% endif %}
+  </div>
+  <a href="{% url 'pages:contact' %}#book" class="btn-primary mt-8">{% if b.is_active %}Book another call{% else %}Book a new time{% endif %}</a>
+</div>
+{% endtimezone %}{% endblock %}

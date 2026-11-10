@@ -1,0 +1,12 @@
+{% load tz %}{% autoescape off %}{% timezone b.visitor_timezone %}Hi {{ b.name }},
+
+Good news: your call is confirmed.
+
+When: {{ local_start|date:"l, j F Y, H:i" }} ({{ b.visitor_timezone }}), {{ settings.duration_minutes }} minutes
+{% if b.meeting_link %}Join: {{ b.meeting_link }}
+{% endif %}Reference: {{ b.short_ref }}
+
+Cancel or reschedule: {{ manage_url }}
+
+– The {{ SITE_NAME }} team
+{% endtimezone %}{% endautoescape %}

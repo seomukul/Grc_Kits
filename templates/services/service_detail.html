@@ -12,7 +12,7 @@
         <p class="mt-3 max-w-2xl text-lg text-brand-100">{{ service.summary }}</p>
         <div class="mt-6 flex flex-wrap gap-3">
           <a href="#inquire" class="btn bg-white text-brand-900 hover:bg-brand-50">{{ service.cta_label }}</a>
-          {% if site_settings.booking_url %}<a href="{{ site_settings.booking_url }}" target="_blank" rel="noopener" class="btn border border-white/30 text-white hover:bg-white/10">{% include "partials/_icon.html" with name="calendar" cls="size-4" %} Book a free call</a>{% endif %}
+          {% if booking_enabled %}<a href="{% url 'pages:contact' %}?service={{ service.slug }}#book" class="btn-ghost-light">{% include "partials/_icon.html" with name="calendar" cls="size-4" %} Book a free call</a>{% elif site_settings.booking_url %}<a href="{{ site_settings.booking_url }}" target="_blank" rel="noopener" class="btn-ghost-light">{% include "partials/_icon.html" with name="calendar" cls="size-4" %} Book a free call</a>{% endif %}
         </div>
       </div>
     </div>

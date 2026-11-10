@@ -108,7 +108,7 @@ Starting categories (seeded): ISO 27001 · ISO 42001 / AI Governance · Risk Man
 - ✅ Replicate every service from https://cyberprolab.com/services/ (owner's own site): same headings, descriptions, structure
 - ✅ Detail page: overview, deliverables, process steps, who it's for, FAQ
 - ✅ Enquiry form → emailed (Reply-To customer) + saved as lead · service dropdown · optional file upload (private storage)
-- ✅ Calendly / Cal.com booking link (Site settings) · ✅ add/edit/reorder in admin
+- ✅ Built-in Calendly-style booking on the contact page (visitor timezone, availability rules, days off, .ics invites, cancel link, admin confirm/cancel) · ✅ add/edit/reorder in admin
 
 ## 8. Other
 

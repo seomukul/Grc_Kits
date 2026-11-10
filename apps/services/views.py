@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 
+from apps.bookings.models import BookingSettings
 from apps.core.models import SiteSettings
 from apps.core.spam import rate_limited
 
@@ -25,6 +26,7 @@ def service_detail(request, slug):
             "service": service,
             "form": InquiryForm(show_service=False),
             "site_settings": SiteSettings.load(),
+            "booking_enabled": BookingSettings.load().is_enabled,
             "others": Service.objects.filter(is_active=True).exclude(pk=service.pk)[:3],
         },
     )

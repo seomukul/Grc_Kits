@@ -1,0 +1,15 @@
+{% load tz %}{% autoescape off %}New call booking ({{ b.get_status_display }})
+
+When (your time): {{ owner_start|timezone:settings.timezone|date:"l, j F Y, H:i" }} ({{ settings.timezone }})
+Their time: {{ local_start|timezone:b.visitor_timezone|date:"l, j F Y, H:i" }} ({{ b.visitor_timezone }})
+
+Name: {{ b.name }}
+Email: {{ b.email }}
+Company: {{ b.company|default:"–" }}
+Phone: {{ b.phone|default:"–" }}
+Topic: {{ b.service|default:"General" }}
+
+{{ b.notes|default:"(no notes)" }}
+
+{% if b.status == "pending" %}Confirm or cancel: {% else %}Manage: {% endif %}{{ admin_url }}
+{% endautoescape %}

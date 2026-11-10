@@ -1,0 +1,30 @@
+<div class="select-none">
+  <div class="flex items-center justify-between">
+    <p class="font-display text-lg text-slate-900">{{ first|date:"F Y" }}</p>
+    <div class="flex gap-1">
+      <button type="button" class="rounded-sm border border-slate-300 px-2.5 py-1 text-sm hover:border-brand-500 disabled:opacity-30" aria-label="Previous month"
+              {% if prev_month %}hx-get="{% url 'bookings:month' %}?month={{ prev_month|date:'Y-m' }}&tz={{ tz|urlencode }}" hx-target="#booking-month"{% else %}disabled{% endif %}>&lsaquo;</button>
+      <button type="button" class="rounded-sm border border-slate-300 px-2.5 py-1 text-sm hover:border-brand-500 disabled:opacity-30" aria-label="Next month"
+              {% if next_month %}hx-get="{% url 'bookings:month' %}?month={{ next_month|date:'Y-m' }}&tz={{ tz|urlencode }}" hx-target="#booking-month"{% else %}disabled{% endif %}>&rsaquo;</button>
+    </div>
+  </div>
+  <div class="mt-3 grid grid-cols-7 text-center text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+    {% for d in "MTWTFSS" %}<div class="py-1">{{ d }}</div>{% endfor %}
+  </div>
+  <div class="grid grid-cols-7 gap-1 text-center text-sm" role="grid">
+    {% for week in weeks %}{% for d in week %}
+      {% if d.month != first.month %}<div></div>
+      {% elif d in available %}
+        <button type="button" role="gridcell"
+                class="h-10 rounded-sm border border-brand-400/70 bg-brand-50 font-semibold text-brand-800 transition hover:bg-brand-400 hover:text-brand-950"
+                :class="selected === '{{ d|date:'Y-m-d' }}' && '!bg-brand-600 !text-white !border-brand-600'"
+                @click="selected = '{{ d|date:'Y-m-d' }}'"
+                hx-get="{% url 'bookings:day' %}?date={{ d|date:'Y-m-d' }}&tz={{ tz|urlencode }}" hx-target="#booking-day"
+                aria-label="{{ d|date:'l j F' }}, times available">{{ d.day }}</button>
+      {% else %}
+        <div class="grid h-10 place-items-center rounded-sm text-slate-300 {% if d == today %}ring-1 ring-slate-300{% endif %}" aria-disabled="true">{{ d.day }}</div>
+      {% endif %}
+    {% endfor %}{% endfor %}
+  </div>
+  {% if not available %}<p class="mt-3 text-sm text-slate-500">No free times this month{% if next_month %}. Try next month{% endif %}.</p>{% endif %}
+</div>

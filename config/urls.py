@@ -29,6 +29,7 @@ urlpatterns = [
     path("newsletter/", include("apps.marketing.urls")),
     path("blog/", include("apps.blog.urls")),
     path("services/", include("apps.services.urls")),
+    path("book/", include("apps.bookings.urls")),
     path("dashboard/", include("apps.dashboard.urls")),
     path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="sitemap"),
     # Keep pages last: it owns "/" and the "/<slug>/" catch-all for CMS pages.
